@@ -1,0 +1,14 @@
+FROM node:22-bookworm-slim
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+
+RUN npx prisma generate
+
+EXPOSE 3001
+
+CMD ["sh", "-lc", "npx prisma db push && npm run dev -- --hostname 0.0.0.0 --port 3001"]
