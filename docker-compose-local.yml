@@ -7,8 +7,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    # ports:
-    #   - "5432:5432"
+    ports:
+      - "5432:5432"
     volumes:
       - portal-postgres-data:/var/lib/postgresql/data
     networks:
@@ -56,8 +56,8 @@ services:
       - metabase-data:/metabase-data
     networks:
       - shegymz-network
-    # ports:
-    #   - "3002:3000"
+    ports:
+      - "3002:3000"
 
   portal:
     build:
@@ -80,8 +80,8 @@ services:
       PLUNK_FROM_EMAIL: ${PLUNK_FROM_EMAIL}
       PORTAL_CONTACT_EMAIL: ${PORTAL_CONTACT_EMAIL}
       NODE_ENV: development
-    # ports:
-    #   - "3001:3001"
+    ports:
+      - "3001:3001"
     volumes:
       - .:/app
       - portal-node-modules:/app/node_modules
