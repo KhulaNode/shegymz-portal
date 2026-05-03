@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifySignupChallenge } from '@/lib/signup-challenges';
+import { issueSignupContinuation, signupContinuation } from '@/lib/signup-continuation';
 import { signupVerifySchema } from '@/lib/signup';
 
 export async function POST(request: NextRequest) {
@@ -34,11 +35,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error }, { status });
   }
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     success: true,
     email: parsed.data.email.toLowerCase(),
     challengeId: result.challengeId,
     providerReference: result.providerReference ?? null,
     nextStep: 'account-creation',
+    continuationExpiresInSeconds: signupContinuation.ttlSeconds,
   });
+
+  issueSignupContinuation(response, {
+    email: parsed.data.email.toLowerCase(),
+    challengeId: result.challengeId,
+  });
+
+  return response;
 }
