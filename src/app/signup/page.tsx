@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import { signIn } from 'next-auth/react';
 
 type Step = 'email' | 'otp' | 'verified' | 'account-created';
 type VerifyOtpResponse = {
@@ -286,9 +287,7 @@ export default function SignupPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    window.location.href = '/api/auth/signin/google?callbackUrl=/portal';
-                  }}
+                  onClick={() => signIn('google', { callbackUrl: '/portal' })}
                   className="rounded-2xl border border-plum-300 px-5 py-3 text-sm font-semibold text-plum-900"
                 >
                   Continue with Google
