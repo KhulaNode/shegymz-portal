@@ -1,7 +1,9 @@
 'use client';
 
+import { Suspense } from 'react';
 import { FormEvent, useState } from 'react';
 import { signIn } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
 
 type Step = 'email' | 'otp' | 'verified' | 'account-created';
 type VerifyOtpResponse = {
@@ -13,7 +15,20 @@ type PasswordAccountResponse = {
   loginEmail?: string;
 };
 
-export default function SignupPage() {
+const SIGNUP_AUTH_ERROR_MESSAGES: Record<string, string> = {
+  'google-email-missing': 'Google did not return an email address for this account. Use a Google account with a visible email address.',
+  'google-email-mismatch':
+    'That Google account does not match the paid-member email that passed OTP. Sign in with the same email used for payment and OTP.',
+  'signup-gate-required':
+    'Google signup must start from the OTP-passed signup flow. Begin again with the paid-member email and verification code.',
+  'google-account-missing':
+    'Google sign-in did not return a usable account identity. Please try again.',
+  'google-account-already-linked':
+    'That Google account is already linked to a different portal user. Use the correct paid-member email or log in to the existing account.',
+};
+
+function SignupPageContent() {
+  const searchParams = useSearchParams();
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [otpCode, setOtpCode] = useState('');
@@ -23,6 +38,8 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const authError = searchParams.get('error');
+  const authErrorMessage = authError ? SIGNUP_AUTH_ERROR_MESSAGES[authError] : '';
 
   async function handleRequestOtp(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -136,6 +153,12 @@ export default function SignupPage() {
           Portal signup starts with the same email used during SheGymZ payment. The portal
           checks active Paystack membership before it sends an OTP.
         </p>
+
+        {authErrorMessage && (
+          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-800">
+            {authErrorMessage}
+          </div>
+        )}
 
         {step === 'email' && (
           <form onSubmit={handleRequestOtp} className="space-y-5">
@@ -317,5 +340,13 @@ export default function SignupPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignupPageContent />
+    </Suspense>
   );
 }
