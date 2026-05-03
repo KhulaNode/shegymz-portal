@@ -1,7 +1,9 @@
 import type { NextAuthOptions } from 'next-auth';
+import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { decodeSignupContinuation, signupContinuation } from '@/lib/signup-continuation';
+import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 
 export const authOptions: NextAuthOptions = {
@@ -9,6 +11,52 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
   },
   providers: [
+    CredentialsProvider({
+      name: 'Email and password',
+      credentials: {
+        email: {
+          label: 'Email',
+          type: 'email',
+        },
+        password: {
+          label: 'Password',
+          type: 'password',
+        },
+      },
+      async authorize(credentials) {
+        const email = credentials?.email?.trim().toLowerCase();
+        const password = credentials?.password;
+
+        if (!email || !password) {
+          return null;
+        }
+
+        const user = await prisma.user.findUnique({
+          where: { email },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            passwordHash: true,
+          },
+        });
+
+        if (!user?.passwordHash) {
+          return null;
+        }
+
+        const passwordMatches = await bcrypt.compare(password, user.passwordHash);
+        if (!passwordMatches) {
+          return null;
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+        };
+      },
+    }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID ?? '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
@@ -108,7 +156,18 @@ export const authOptions: NextAuthOptions = {
 
       return true;
     },
+    async jwt({ token, user }) {
+      if (user?.id) {
+        token.sub = user.id;
+      }
+
+      return token;
+    },
     async session({ session }) {
+      if (session.user && session.user.email) {
+        session.user.email = session.user.email.toLowerCase();
+      }
+
       return session;
     },
   },
