@@ -6,7 +6,7 @@ const SIGNUP_CONTINUATION_COOKIE = 'shegymz_portal_signup';
 const SIGNUP_CONTINUATION_PURPOSE = 'signup-continuation';
 const SIGNUP_CONTINUATION_TTL_SECONDS = 15 * 60;
 
-type SignupContinuationPayload = {
+export type SignupContinuationPayload = {
   purpose: typeof SIGNUP_CONTINUATION_PURPOSE;
   email: string;
   challengeId: string;
@@ -40,7 +40,7 @@ function encodePayload(payload: SignupContinuationPayload) {
   return `${encodedPayload}.${signature}`;
 }
 
-function decodePayload(token: string): SignupContinuationPayload | null {
+export function decodeSignupContinuation(token: string): SignupContinuationPayload | null {
   const [encodedPayload, providedSignature] = token.split('.');
   if (!encodedPayload || !providedSignature) {
     return null;
@@ -112,7 +112,7 @@ export function readSignupContinuation(request: NextRequest) {
     return null;
   }
 
-  return decodePayload(token);
+  return decodeSignupContinuation(token);
 }
 
 export const signupContinuation = {

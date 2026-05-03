@@ -286,16 +286,18 @@ export default function SignupPage() {
                 </button>
                 <button
                   type="button"
-                  disabled
-                  className="rounded-2xl border border-plum-300 px-5 py-3 text-sm font-semibold text-plum-500 disabled:cursor-not-allowed"
+                  onClick={() => {
+                    window.location.href = '/api/auth/signin/google?callbackUrl=/portal';
+                  }}
+                  className="rounded-2xl border border-plum-300 px-5 py-3 text-sm font-semibold text-plum-900"
                 >
                   Continue with Google
                 </button>
               </div>
 
               <p className="text-sm text-plum-700">
-                Google account creation will be enabled in the next auth step, but it will
-                still be locked to <span className="font-semibold">{email}</span>.
+                Google signup is allowed only for <span className="font-semibold">{email}</span>.
+                Direct Google entry without this OTP-passed signup gate will be rejected.
               </p>
             </form>
           </div>
