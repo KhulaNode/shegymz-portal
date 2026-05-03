@@ -3,6 +3,10 @@
 import { FormEvent, useState } from 'react';
 
 type Step = 'email' | 'otp' | 'verified';
+type VerifyOtpResponse = {
+  error?: string;
+  continuationExpiresInSeconds?: number;
+};
 
 export default function SignupPage() {
   const [step, setStep] = useState<Step>('email');
@@ -58,13 +62,15 @@ export default function SignupPage() {
         body: JSON.stringify({ email, code: otpCode }),
       });
 
-      const data = (await response.json().catch(() => ({}))) as { error?: string };
+      const data = (await response.json().catch(() => ({}))) as VerifyOtpResponse;
       if (!response.ok) {
         throw new Error(data.error ?? 'Verification failed');
       }
 
       setStep('verified');
-      setMessage('Verification passed. Milestone 3 will unlock Google or password account creation here.');
+      setMessage(
+        `Verification passed. Your signup session is locked to this paid-member email for the next ${Math.floor((data.continuationExpiresInSeconds ?? 0) / 60)} minutes.`,
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Verification failed');
     } finally {
