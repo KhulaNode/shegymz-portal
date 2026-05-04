@@ -80,13 +80,9 @@ services:
       PLUNK_API_KEY: ${PLUNK_API_KEY}
       PLUNK_FROM_EMAIL: ${PLUNK_FROM_EMAIL}
       PORTAL_CONTACT_EMAIL: ${PORTAL_CONTACT_EMAIL}
-      NODE_ENV: development
+      NODE_ENV: production
     ports:
       - "3001:3001"
-    volumes:
-      - .:/app
-      - portal-node-modules:/app/node_modules
-      - portal-next-cache:/app/.next
     networks:
       - shegymz-network
 
@@ -94,8 +90,6 @@ volumes:
   portal-postgres-data:
   metabase-data:
   metabase-postgres-data:
-  portal-node-modules:
-  portal-next-cache:
 
 networks:
   shegymz-network:
