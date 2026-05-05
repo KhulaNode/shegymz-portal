@@ -15,5 +15,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/portal/:path*', '/mina/:path*'],
+  matcher: ['/portal/:path*', '/schedule/:path*', '/mina/:path*'],
 };

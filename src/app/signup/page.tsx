@@ -40,6 +40,11 @@ function SignupPageContent() {
   const [message, setMessage] = useState('');
   const authError = searchParams.get('error');
   const authErrorMessage = authError ? SIGNUP_AUTH_ERROR_MESSAGES[authError] : '';
+  const nextParam = searchParams.get('next');
+  const callbackUrl = nextParam?.startsWith('/') ? nextParam : '/portal';
+  const loginHref = nextParam?.startsWith('/')
+    ? `/login?next=${encodeURIComponent(nextParam)}`
+    : '/login';
 
   async function handleRequestOtp(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -143,112 +148,149 @@ function SignupPageContent() {
   }
 
   return (
-    <main className="min-h-screen bg-sand px-6 py-20">
-      <div className="mx-auto max-w-3xl rounded-3xl border border-plum-100 bg-white p-8 shadow-sm">
-        <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-plum-700">
-          First-Time Signup
-        </p>
-        <h1 className="mb-4 text-4xl font-bold text-plum-900">Membership check and OTP gate</h1>
-        <p className="mb-6 text-lg leading-8 text-plum-800">
-          Portal signup starts with the same email used during SheGymZ payment. The portal
-          checks active Paystack membership before it sends an OTP.
-        </p>
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(243,223,241,0.55),_transparent_42%),linear-gradient(180deg,#fcfaf8_0%,#f5f1ec_100%)] px-6 py-16 sm:px-8 lg:px-10">
+      <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+        <section className="rounded-[2rem] bg-plum-900 p-8 text-white shadow-[0_24px_80px_rgba(53,18,41,0.18)] sm:p-10">
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-white/65">
+            First-Time Signup
+          </p>
+          <h1 className="mt-4 text-4xl font-bold leading-tight sm:text-5xl">
+            Turn a paid SheGymZ membership into a verified portal account.
+          </h1>
+          <p className="mt-5 text-base leading-8 text-white/82 sm:text-lg">
+            Signup is intentionally tight. The portal checks the paid-member email first, sends
+            a verification code, then locks account creation to that exact email.
+          </p>
 
-        {authErrorMessage && (
-          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-800">
-            {authErrorMessage}
+          <div className="mt-8 space-y-3">
+            <div className={`rounded-2xl border px-4 py-4 text-sm ${step === 'email' ? 'border-white/20 bg-white/14 text-white' : 'border-white/10 bg-white/8 text-white/72'}`}>
+              1. Confirm the paid-member email before OTP is sent.
+            </div>
+            <div className={`rounded-2xl border px-4 py-4 text-sm ${step === 'otp' ? 'border-white/20 bg-white/14 text-white' : 'border-white/10 bg-white/8 text-white/72'}`}>
+              2. Verify the OTP and bind the signup session to that email.
+            </div>
+            <div className={`rounded-2xl border px-4 py-4 text-sm ${(step === 'verified' || step === 'account-created') ? 'border-white/20 bg-white/14 text-white' : 'border-white/10 bg-white/8 text-white/72'}`}>
+              3. Finish account creation with password or Google.
+            </div>
           </div>
-        )}
 
-        {step === 'email' && (
-          <form onSubmit={handleRequestOtp} className="space-y-5">
-            <div>
-              <label htmlFor="email" className="mb-2 block text-sm font-semibold text-plum-900">
-                Membership Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-2xl border border-plum-200 px-4 py-3 text-base outline-none ring-0 transition focus:border-plum-700"
-                placeholder="you@example.com"
-                required
-              />
+          <div className="mt-8 rounded-3xl border border-white/10 bg-white/8 p-5 text-sm leading-7 text-white/80">
+            Already onboarded? Use the{' '}
+            <a href={loginHref} className="font-semibold text-white">
+              returning-member login
+            </a>{' '}
+            instead of restarting signup.
+          </div>
+        </section>
+
+        <section className="rounded-[2rem] border border-plum-100/80 bg-white/92 p-8 shadow-[0_24px_80px_rgba(53,18,41,0.08)] backdrop-blur sm:p-10">
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-plum-700">
+            Portal Signup
+          </p>
+          <h2 className="mt-4 text-3xl font-bold text-plum-900 sm:text-4xl">
+            Verify first. Create the account after the portal trusts the email.
+          </h2>
+          <p className="mt-4 text-base leading-8 text-plum-800 sm:text-lg">
+            This keeps `1 email = 1 user = 1 subscription` intact from payment through protected access.
+          </p>
+
+          {authErrorMessage && (
+            <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-800">
+              {authErrorMessage}
             </div>
+          )}
 
-            {error && <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+          {step === 'email' && (
+            <form onSubmit={handleRequestOtp} className="mt-8 space-y-5">
+              <div>
+                <label htmlFor="email" className="mb-2 block text-sm font-semibold text-plum-900">
+                  Membership Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-2xl border border-plum-200 bg-sand/35 px-4 py-3 text-base outline-none ring-0 transition focus:border-plum-700"
+                  placeholder="you@example.com"
+                  required
+                />
+              </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="rounded-2xl bg-plum-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
-            >
-              {isLoading ? 'Checking membership...' : 'Check membership and send OTP'}
-            </button>
-          </form>
-        )}
+              {error && <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
-        {step === 'otp' && (
-          <form onSubmit={handleVerifyOtp} className="space-y-5">
-            <div className="rounded-2xl bg-sand px-4 py-3 text-sm text-plum-900">{message}</div>
-
-            <div>
-              <label htmlFor="otpCode" className="mb-2 block text-sm font-semibold text-plum-900">
-                6-digit verification code
-              </label>
-              <input
-                id="otpCode"
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                className="w-full rounded-2xl border border-plum-200 px-4 py-3 text-base tracking-[0.3em] outline-none transition focus:border-plum-700"
-                placeholder="000000"
-                required
-              />
-            </div>
-
-            {error && <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
-
-            <div className="flex flex-wrap gap-3">
               <button
                 type="submit"
                 disabled={isLoading}
-                className="rounded-2xl bg-plum-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                className="rounded-full bg-plum-900 px-6 py-3 text-sm font-semibold text-white disabled:opacity-60"
               >
-                {isLoading ? 'Verifying...' : 'Verify OTP'}
+                {isLoading ? 'Checking membership...' : 'Check membership and send OTP'}
               </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setStep('email');
-                  setOtpCode('');
-                  setError('');
-                  setMessage('');
-                }}
-                className="rounded-2xl border border-plum-300 px-5 py-3 text-sm font-semibold text-plum-900"
-              >
-                Start over
-              </button>
-            </div>
-          </form>
-        )}
+            </form>
+          )}
 
-        {step === 'verified' && (
-          <div className="space-y-4">
-            <div className="rounded-2xl bg-emerald-50 px-4 py-4 text-sm text-emerald-800">
-              {message}
-            </div>
-            <div className="rounded-2xl border border-plum-100 bg-sand p-5 text-sm leading-7 text-plum-900">
-              Verified member identity:
-              <br />
-              <span className="font-semibold">{email}</span>
-              <br />
-              This is now the only email allowed for portal account creation.
-            </div>
-            <form onSubmit={handleCreatePasswordAccount} className="space-y-5 rounded-3xl border border-plum-100 bg-white p-5">
+          {step === 'otp' && (
+            <form onSubmit={handleVerifyOtp} className="mt-8 space-y-5">
+              <div className="rounded-2xl border border-plum-100 bg-sand px-4 py-4 text-sm leading-7 text-plum-900">
+                {message}
+              </div>
+
+              <div>
+                <label htmlFor="otpCode" className="mb-2 block text-sm font-semibold text-plum-900">
+                  6-digit verification code
+                </label>
+                <input
+                  id="otpCode"
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                  className="w-full rounded-2xl border border-plum-200 bg-sand/35 px-4 py-3 text-base tracking-[0.3em] outline-none transition focus:border-plum-700"
+                  placeholder="000000"
+                  required
+                />
+              </div>
+
+              {error && <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="rounded-full bg-plum-900 px-6 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                >
+                  {isLoading ? 'Verifying...' : 'Verify OTP'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep('email');
+                    setOtpCode('');
+                    setError('');
+                    setMessage('');
+                  }}
+                  className="rounded-full border border-plum-300 px-6 py-3 text-sm font-semibold text-plum-900"
+                >
+                  Start over
+                </button>
+              </div>
+            </form>
+          )}
+
+          {step === 'verified' && (
+            <div className="mt-8 space-y-4">
+              <div className="rounded-2xl bg-emerald-50 px-4 py-4 text-sm text-emerald-800">
+                {message}
+              </div>
+              <div className="rounded-3xl border border-plum-100 bg-sand/65 p-5 text-sm leading-7 text-plum-900">
+                Verified member identity:
+                <br />
+                <span className="font-semibold">{email}</span>
+                <br />
+                This is now the only email allowed for portal account creation.
+              </div>
+              <form onSubmit={handleCreatePasswordAccount} className="space-y-5 rounded-3xl border border-plum-100 bg-sand/25 p-5">
               <div>
                 <label htmlFor="name" className="mb-2 block text-sm font-semibold text-plum-900">
                   Full name
@@ -258,7 +300,7 @@ function SignupPageContent() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-2xl border border-plum-200 px-4 py-3 text-base outline-none transition focus:border-plum-700"
+                  className="w-full rounded-2xl border border-plum-200 bg-white px-4 py-3 text-base outline-none transition focus:border-plum-700"
                   placeholder="Your name"
                 />
               </div>
@@ -272,7 +314,7 @@ function SignupPageContent() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-2xl border border-plum-200 px-4 py-3 text-base outline-none transition focus:border-plum-700"
+                  className="w-full rounded-2xl border border-plum-200 bg-white px-4 py-3 text-base outline-none transition focus:border-plum-700"
                   placeholder="At least 8 characters"
                   minLength={8}
                   required
@@ -291,7 +333,7 @@ function SignupPageContent() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full rounded-2xl border border-plum-200 px-4 py-3 text-base outline-none transition focus:border-plum-700"
+                  className="w-full rounded-2xl border border-plum-200 bg-white px-4 py-3 text-base outline-none transition focus:border-plum-700"
                   placeholder="Repeat password"
                   minLength={8}
                   required
@@ -304,14 +346,14 @@ function SignupPageContent() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="rounded-2xl bg-plum-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                  className="rounded-full bg-plum-900 px-6 py-3 text-sm font-semibold text-white disabled:opacity-60"
                 >
                   {isLoading ? 'Creating account...' : 'Create account with password'}
                 </button>
                 <button
                   type="button"
-                  onClick={() => signIn('google', { callbackUrl: '/portal' })}
-                  className="rounded-2xl border border-plum-300 px-5 py-3 text-sm font-semibold text-plum-900"
+                  onClick={() => signIn('google', { callbackUrl })}
+                  className="rounded-full border border-plum-300 px-6 py-3 text-sm font-semibold text-plum-900"
                 >
                   Continue with Google
                 </button>
@@ -321,23 +363,24 @@ function SignupPageContent() {
                 Google signup is allowed only for <span className="font-semibold">{email}</span>.
                 Direct Google entry without this OTP-passed signup gate will be rejected.
               </p>
-            </form>
-          </div>
-        )}
-
-        {step === 'account-created' && (
-          <div className="space-y-4">
-            <div className="rounded-2xl bg-emerald-50 px-4 py-4 text-sm text-emerald-800">
-              {message}
+              </form>
             </div>
-            <a
-              href="/login"
-              className="inline-flex rounded-2xl bg-plum-900 px-5 py-3 text-sm font-semibold text-white"
-            >
-              Continue to login
-            </a>
-          </div>
-        )}
+          )}
+
+          {step === 'account-created' && (
+            <div className="mt-8 space-y-4">
+              <div className="rounded-2xl bg-emerald-50 px-4 py-4 text-sm text-emerald-800">
+                {message}
+              </div>
+              <a
+                href={loginHref}
+                className="inline-flex rounded-full bg-plum-900 px-6 py-3 text-sm font-semibold text-white"
+              >
+                Continue to login
+              </a>
+            </div>
+          )}
+        </section>
       </div>
     </main>
   );
