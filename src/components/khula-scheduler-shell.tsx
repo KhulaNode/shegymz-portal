@@ -35,7 +35,7 @@ const initialEvents: Event[] = [
 
 export function KhulaSchedulerShell() {
   return (
-    <div className="rounded-[32px] border border-plum-100 bg-white p-4 shadow-sm sm:p-6">
+    <div className="rounded-[2.5rem] border border-plum-100/80 bg-white/94 p-4 shadow-[0_24px_80px_rgba(53,18,41,0.08)] backdrop-blur sm:p-6">
       <SchedulerProvider initialState={initialEvents} weekStartsOn="monday">
         <KhulaScheduler />
       </SchedulerProvider>

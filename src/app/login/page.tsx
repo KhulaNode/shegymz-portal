@@ -3,8 +3,10 @@
 import { Suspense } from 'react';
 import { FormEvent, useState } from 'react';
 import { signIn } from 'next-auth/react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { PortalBrandHeader } from '@/components/portal-brand-header';
 
 const LOGIN_ERROR_MESSAGES: Record<string, string> = {
   'account-missing':
@@ -25,7 +27,7 @@ function LoginPageContent() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const nextParam = searchParams.get('next');
-  const callbackUrl = nextParam?.startsWith('/') ? nextParam : '/portal';
+  const callbackUrl = nextParam?.startsWith('/') ? nextParam : '/schedule';
   const routeError = searchParams.get('error');
   const routeErrorMessage = routeError ? LOGIN_ERROR_MESSAGES[routeError] : '';
 
@@ -56,43 +58,54 @@ function LoginPageContent() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(243,223,241,0.55),_transparent_42%),linear-gradient(180deg,#fcfaf8_0%,#f5f1ec_100%)] px-6 py-16 sm:px-8 lg:px-10">
-      <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.95fr_1.05fr]">
-        <section className="rounded-[2rem] bg-plum-900 p-8 text-white shadow-[0_24px_80px_rgba(53,18,41,0.18)] sm:p-10">
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-white/65">
-            Returning Members
-          </p>
-          <h1 className="mt-4 text-4xl font-bold leading-tight sm:text-5xl">
-            Step back into your SheGymZ portal without reopening signup.
-          </h1>
-          <p className="mt-5 text-base leading-8 text-white/82 sm:text-lg">
-            Use the same paid-member email that cleared payment and signup. If you were sent here
-            from a protected page, successful login will take you back there.
-          </p>
-          <div className="mt-8 space-y-3">
-            <div className="rounded-2xl border border-white/10 bg-white/8 px-4 py-4 text-sm text-white/80">
-              Email remains the identity anchor for membership checks and protected access.
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/8 px-4 py-4 text-sm text-white/80">
-              Google and password login both return to the same protected destination.
-            </div>
-            {nextParam?.startsWith('/') && (
-              <div className="rounded-2xl border border-white/15 bg-white/12 px-4 py-4 text-sm text-white">
-                Protected destination waiting after login: <span className="font-semibold">{nextParam}</span>
+    <main className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
+      <PortalBrandHeader accent="Returning Member Access" />
+      <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_0.95fr]">
+        <section className="relative overflow-hidden rounded-[2.5rem] shadow-[0_24px_80px_rgba(53,18,41,0.12)]">
+          <Image
+            src="/images/IMG_3757.jpeg"
+            alt="SheGymZ member space"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-plum-900/82 via-plum-900/48 to-plum-900/20" />
+          <div className="relative flex min-h-[620px] flex-col justify-end p-8 text-white sm:p-10">
+            <p className="text-sm font-semibold uppercase tracking-[0.32em] text-white/68">
+              Returning Members
+            </p>
+            <h1 className="mt-4 max-w-xl text-4xl font-semibold leading-tight sm:text-5xl">
+              Welcome back to your SheGymZ space.
+            </h1>
+            <p className="mt-5 max-w-lg text-base leading-8 text-white/84 sm:text-lg">
+              A quiet return to your schedule, your rhythm, and the work you are doing for
+              yourself.
+            </p>
+            <div className="mt-8 grid gap-3 sm:max-w-lg">
+              <div className="rounded-2xl border border-white/12 bg-white/10 px-4 py-4 text-sm text-white/82">
+                Quiet, familiar, and easy to return to.
               </div>
-            )}
+              <div className="rounded-2xl border border-white/12 bg-white/10 px-4 py-4 text-sm text-white/82">
+                Straight back into your SheGymZ flow.
+              </div>
+              {nextParam?.startsWith('/') && (
+                <div className="rounded-2xl border border-white/18 bg-white/14 px-4 py-4 text-sm text-white">
+                  Protected destination waiting after login: <span className="font-semibold">{nextParam}</span>
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-plum-100/80 bg-white/92 p-8 shadow-[0_24px_80px_rgba(53,18,41,0.08)] backdrop-blur sm:p-10">
+        <section className="rounded-[2.5rem] border border-plum-100/80 bg-white/92 p-8 shadow-[0_24px_80px_rgba(53,18,41,0.08)] backdrop-blur sm:p-10">
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-plum-700">
             Login
           </p>
           <h2 className="mt-4 text-3xl font-bold text-plum-900 sm:text-4xl">
-            Enter the portal with your existing member account.
+            Sign in.
           </h2>
           <p className="mt-4 text-base leading-8 text-plum-800 sm:text-lg">
-            First time here? Start with OTP-verified signup before you try to log in.
+            Return with the account you created when you first activated your access.
           </p>
 
           {routeErrorMessage && (
@@ -152,13 +165,13 @@ function LoginPageContent() {
             </div>
           </form>
 
-          <div className="mt-8 rounded-3xl border border-plum-100 bg-sand/55 p-5 text-sm leading-7 text-plum-800">
-            Need a portal account first?{' '}
+          <div className="mt-8 rounded-[1.75rem] border border-plum-100 bg-[#faf7f4] p-5 text-sm leading-7 text-plum-800">
+            New to the portal?{' '}
             <Link
               href={nextParam?.startsWith('/') ? `/signup?next=${encodeURIComponent(nextParam)}` : '/signup'}
               className="font-semibold text-plum-900"
             >
-              Complete first-time signup
+              Activate your access
             </Link>
             .
           </div>

@@ -3,7 +3,9 @@
 import { Suspense } from 'react';
 import { FormEvent, useState } from 'react';
 import { signIn } from 'next-auth/react';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
+import { PortalBrandHeader } from '@/components/portal-brand-header';
 
 type Step = 'email' | 'otp' | 'verified' | 'account-created';
 type VerifyOtpResponse = {
@@ -41,10 +43,10 @@ function SignupPageContent() {
   const authError = searchParams.get('error');
   const authErrorMessage = authError ? SIGNUP_AUTH_ERROR_MESSAGES[authError] : '';
   const nextParam = searchParams.get('next');
-  const callbackUrl = nextParam?.startsWith('/') ? nextParam : '/portal';
+  const callbackUrl = nextParam?.startsWith('/') ? nextParam : '/schedule';
   const loginHref = nextParam?.startsWith('/')
     ? `/login?next=${encodeURIComponent(nextParam)}`
-    : '/login';
+    : '/login?next=%2Fschedule';
 
   async function handleRequestOtp(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -148,21 +150,31 @@ function SignupPageContent() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(243,223,241,0.55),_transparent_42%),linear-gradient(180deg,#fcfaf8_0%,#f5f1ec_100%)] px-6 py-16 sm:px-8 lg:px-10">
-      <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-        <section className="rounded-[2rem] bg-plum-900 p-8 text-white shadow-[0_24px_80px_rgba(53,18,41,0.18)] sm:p-10">
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-white/65">
-            First-Time Signup
-          </p>
-          <h1 className="mt-4 text-4xl font-bold leading-tight sm:text-5xl">
-            Turn a paid SheGymZ membership into a verified portal account.
-          </h1>
-          <p className="mt-5 text-base leading-8 text-white/82 sm:text-lg">
-            Signup is intentionally tight. The portal checks the paid-member email first, sends
-            a verification code, then locks account creation to that exact email.
-          </p>
+    <main className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
+      <PortalBrandHeader accent="First-Time Member Onboarding" />
+      <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+        <section className="relative overflow-hidden rounded-[2.5rem] shadow-[0_24px_80px_rgba(53,18,41,0.12)]">
+          <Image
+            src="/images/showcase1.jpeg"
+            alt="SheGymZ onboarding inspiration"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-plum-900/84 via-plum-900/54 to-plum-900/18" />
+          <div className="relative flex min-h-[700px] flex-col justify-end p-8 text-white sm:p-10">
+            <p className="text-sm font-semibold uppercase tracking-[0.32em] text-white/68">
+              First-Time Signup
+            </p>
+            <h1 className="mt-4 max-w-xl text-4xl font-semibold leading-tight sm:text-5xl">
+              Your SheGymZ access begins here.
+            </h1>
+            <p className="mt-5 max-w-lg text-base leading-8 text-white/84 sm:text-lg">
+              A simple first step into a private wellness space shaped by women, care, and
+              consistency.
+            </p>
 
-          <div className="mt-8 space-y-3">
+            <div className="mt-8 space-y-3 sm:max-w-lg">
             <div className={`rounded-2xl border px-4 py-4 text-sm ${step === 'email' ? 'border-white/20 bg-white/14 text-white' : 'border-white/10 bg-white/8 text-white/72'}`}>
               1. Confirm the paid-member email before OTP is sent.
             </div>
@@ -181,17 +193,19 @@ function SignupPageContent() {
             </a>{' '}
             instead of restarting signup.
           </div>
+          </div>
         </section>
 
-        <section className="rounded-[2rem] border border-plum-100/80 bg-white/92 p-8 shadow-[0_24px_80px_rgba(53,18,41,0.08)] backdrop-blur sm:p-10">
+        <section className="rounded-[2.5rem] border border-plum-100/80 bg-white/92 p-8 shadow-[0_24px_80px_rgba(53,18,41,0.08)] backdrop-blur sm:p-10">
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-plum-700">
             Portal Signup
           </p>
           <h2 className="mt-4 text-3xl font-bold text-plum-900 sm:text-4xl">
-            Verify first. Create the account after the portal trusts the email.
+            Let’s get you in.
           </h2>
           <p className="mt-4 text-base leading-8 text-plum-800 sm:text-lg">
-            This keeps `1 email = 1 user = 1 subscription` intact from payment through protected access.
+            Use the same email you subscribed with. Once that is confirmed, you can set up your
+            account and return with ease from then on.
           </p>
 
           {authErrorMessage && (
@@ -283,12 +297,12 @@ function SignupPageContent() {
               <div className="rounded-2xl bg-emerald-50 px-4 py-4 text-sm text-emerald-800">
                 {message}
               </div>
-              <div className="rounded-3xl border border-plum-100 bg-sand/65 p-5 text-sm leading-7 text-plum-900">
-                Verified member identity:
+              <div className="rounded-[1.75rem] border border-plum-100 bg-[#faf7f4] p-5 text-sm leading-7 text-plum-900">
+                Verified email:
                 <br />
                 <span className="font-semibold">{email}</span>
                 <br />
-                This is now the only email allowed for portal account creation.
+                This is the email your portal access will be tied to.
               </div>
               <form onSubmit={handleCreatePasswordAccount} className="space-y-5 rounded-3xl border border-plum-100 bg-sand/25 p-5">
               <div>
@@ -360,8 +374,7 @@ function SignupPageContent() {
               </div>
 
               <p className="text-sm text-plum-700">
-                Google signup is allowed only for <span className="font-semibold">{email}</span>.
-                Direct Google entry without this OTP-passed signup gate will be rejected.
+                Google signup is available only for <span className="font-semibold">{email}</span>.
               </p>
               </form>
             </div>

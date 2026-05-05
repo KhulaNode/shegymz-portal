@@ -29,13 +29,23 @@
   --scheduler-default-100: 243 223 241;
   --scheduler-default-200: 232 214 228;
   --scheduler-default-400: 188 144 174;
+  --portal-warmgray-50: 248 244 240;
+  --portal-warmgray-100: 237 230 224;
+  --portal-warmgray-600: 126 107 100;
 }
 
 body {
   margin: 0;
-  background: #f5f1ec;
+  background:
+    radial-gradient(circle at top, rgba(243, 223, 241, 0.48), transparent 34%),
+    linear-gradient(180deg, #fcfaf8 0%, #f5f1ec 100%);
   color: #351229;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+::selection {
+  background: rgba(243, 223, 241, 0.9);
+  color: #351229;
 }
 
 a {
@@ -45,4 +55,16 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+.text-warmgray-600 {
+  color: rgb(var(--portal-warmgray-600));
+}
+
+.bg-warmgray-50 {
+  background-color: rgb(var(--portal-warmgray-50));
+}
+
+.border-warmgray-100 {
+  border-color: rgb(var(--portal-warmgray-100));
 }
