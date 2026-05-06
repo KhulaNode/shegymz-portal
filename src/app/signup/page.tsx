@@ -44,7 +44,7 @@ type PasswordAccountResponse = {
 
 const SIGNUP_AUTH_ERROR_MESSAGES: Record<string, string> = {
   'google-email-missing': 'Please use a Google account with an email address we can recognise.',
-  'google-email-mismatch': 'Please use the same email you used when joining SheGymZ.',
+  'google-email-mismatch': 'Please use the same email you used when subscribing to SheGymZ.',
   'signup-gate-required': 'For your privacy, please begin by confirming your membership email.',
   'google-account-missing': 'Google did not complete sign-in. Please try again.',
   'google-account-already-linked': 'That Google account is already connected to another member account.',
@@ -228,44 +228,75 @@ function SignupPageContent() {
     <main className="portal-shell min-h-screen px-5 py-6 sm:px-8 lg:px-10">
       <PortalBrandHeader accent="Create member account" />
       <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-        <section className="relative min-h-[380px] overflow-hidden rounded-[2.5rem] shadow-[0_28px_90px_rgba(74,44,74,0.12)] lg:min-h-[720px]">
-          <Image
-            src="/images/showcase1.jpeg"
-            alt="SheGymZ member onboarding"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-plum-900/84 via-plum-900/46 to-plum-900/18" />
-          <div className="relative flex min-h-[380px] flex-col justify-end p-8 text-white sm:p-10 lg:min-h-[720px]">
-            <p className="text-xs font-semibold uppercase tracking-[0.32em] text-white/68">
-              Member onboarding
-            </p>
-            <h1 className="mt-4 max-w-xl text-4xl font-semibold leading-tight sm:text-5xl">
-              {portalCopy.signup.title}
-            </h1>
-            <p className="mt-5 max-w-lg text-base leading-8 text-white/84 sm:text-lg">
-              {portalCopy.signup.subtitle}
-            </p>
+        <section className="relative min-h-[340px] overflow-hidden rounded-[2rem] shadow-[0_32px_100px_rgba(53,18,41,0.28)] sm:rounded-[2.5rem] lg:min-h-[720px]">
 
-            <div className="mt-8 space-y-3 sm:max-w-lg">
-              <div className={`rounded-2xl border px-4 py-4 text-sm leading-7 ${step === 'email' || step === 'no-membership' ? 'border-white/22 bg-white/14 text-white' : 'border-white/10 bg-white/8 text-white/72'}`}>
-                1. {portalCopy.signup.stepEmail}
-              </div>
-              <div className={`rounded-2xl border px-4 py-4 text-sm leading-7 ${step === 'otp' ? 'border-white/22 bg-white/14 text-white' : 'border-white/10 bg-white/8 text-white/72'}`}>
-                2. {portalCopy.signup.stepCode}
-              </div>
-              <div className={`rounded-2xl border px-4 py-4 text-sm leading-7 ${step === 'verified' || step === 'account-created' ? 'border-white/22 bg-white/14 text-white' : 'border-white/10 bg-white/8 text-white/72'}`}>
-                3. {portalCopy.signup.stepFinish}
-              </div>
+          {/* Branded gradient background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-plum-900 via-[#5c1f52] to-[#7d2d6c]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#2e0e2e]/70 via-transparent to-transparent" />
+
+          {/* Ambient glow orbs */}
+          <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-[#9b3a72]/50 blur-[90px]" />
+          <div aria-hidden className="pointer-events-none absolute -left-16 bottom-16 h-72 w-72 rounded-full bg-rose-400/25 blur-[80px]" />
+          <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/3 h-48 w-48 -translate-x-1/2 rounded-full bg-[#c45c80]/20 blur-[70px]" />
+
+          {/* Sparkles */}
+          <span aria-hidden className="pointer-events-none absolute right-8 top-10 select-none text-xl text-rose-300/55">✦</span>
+          <span aria-hidden className="pointer-events-none absolute right-20 top-28 select-none text-xs text-white/20">✦</span>
+          <span aria-hidden className="pointer-events-none absolute bottom-44 right-6 select-none text-sm text-rose-300/35">◆</span>
+          <span aria-hidden className="pointer-events-none absolute left-6 top-16 select-none text-xs text-rose-200/25">✿</span>
+
+          <div className="relative flex min-h-[340px] flex-col justify-between p-6 text-white sm:p-10 lg:min-h-[720px]">
+
+            {/* Logo at top */}
+            <div>
+              <Image
+                src="/images/logo.png"
+                alt="SheGymZ"
+                width={140}
+                height={56}
+                className="h-10 w-auto object-contain brightness-0 invert sm:h-12"
+                priority
+              />
             </div>
 
-            <div className="mt-8 rounded-3xl border border-white/12 bg-white/10 p-5 text-sm leading-7 text-white/82">
-              Already set up? Use the{' '}
-              <a href={loginHref} className="font-semibold text-white">
-                member sign-in
-              </a>{' '}
-              instead.
+            {/* Content at bottom */}
+            <div>
+              <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-white/60">
+                <span className="text-rose-300">✦</span>
+                Member onboarding
+              </p>
+              <h1 className="mt-4 max-w-xl text-[1.75rem] font-semibold leading-tight sm:text-4xl lg:text-5xl">
+                <span className="bg-gradient-to-br from-white via-rose-100 to-rose-200 bg-clip-text text-transparent">
+                  {portalCopy.signup.title}
+                </span>
+              </h1>
+              <p className="mt-4 max-w-lg text-sm leading-7 text-white/75 sm:text-base sm:leading-8">
+                {portalCopy.signup.subtitle}
+              </p>
+
+              <div className="mt-6 space-y-2.5 sm:mt-8 sm:max-w-lg sm:space-y-3">
+                {[
+                  { n: '1', text: portalCopy.signup.stepEmail, active: step === 'email' || step === 'no-membership' },
+                  { n: '2', text: portalCopy.signup.stepCode, active: step === 'otp' },
+                  { n: '3', text: portalCopy.signup.stepFinish, active: step === 'verified' || step === 'account-created' },
+                ].map(({ n, text, active }) => (
+                  <div
+                    key={n}
+                    className={`flex items-start gap-3 rounded-2xl border px-4 py-3.5 text-sm leading-6 transition-all sm:py-4 sm:leading-7 border-rose-300/40 bg-white/18 text-white shadow-[0_8px_28px_rgba(181,64,106,0.18)] ${active ? 'ring-1 ring-rose-300/40' : ''}`}
+                  >
+                    <span className="mt-0.5 shrink-0 text-xs font-bold text-rose-300">{n}</span>
+                    <span>{text}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 rounded-2xl border border-rose-300/20 bg-white/10 p-4 text-sm leading-7 text-white/75 backdrop-blur-sm sm:mt-8 sm:rounded-3xl sm:p-5">
+                Already set up?{' '}
+                <a href={loginHref} className="font-semibold text-rose-200 transition hover:text-white">
+                  Use member sign-in
+                </a>{' '}
+                instead.
+              </div>
             </div>
           </div>
         </section>

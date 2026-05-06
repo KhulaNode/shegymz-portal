@@ -77,16 +77,32 @@ function LoginPageContent() {
     <main className="portal-shell min-h-screen px-5 py-6 sm:px-8 lg:px-10">
       <PortalBrandHeader accent="Returning member" />
       <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1fr_0.95fr]">
-        <section className="relative min-h-[360px] overflow-hidden rounded-[2.5rem] border border-plum-900/10 bg-gradient-to-br from-[#6f466f] via-[#5d395f] to-[#452948] shadow-[0_28px_90px_rgba(74,44,74,0.12)] lg:min-h-[650px]">
+        <section className="relative min-h-[260px] overflow-hidden rounded-[2rem] border border-plum-900/10 bg-gradient-to-br from-[#6f466f] via-[#5d395f] to-[#452948] shadow-[0_32px_100px_rgba(53,18,41,0.28)] sm:min-h-[360px] sm:rounded-[2.5rem] lg:min-h-[650px]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(232,181,195,0.07),_transparent_24%),radial-gradient(circle_at_bottom,_rgba(255,255,255,0.03),_transparent_28%)]" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/logo.png"
-            alt=""
-            aria-hidden="true"
-            className="absolute inset-0 m-auto block h-auto w-[115%] max-w-xl opacity-60"
-            style={{ mixBlendMode: 'luminosity' }}
-          />
+
+          {/* Ambient glow orbs */}
+          <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-[#9b3a72]/50 blur-[90px]" />
+          <div aria-hidden className="pointer-events-none absolute -left-16 bottom-16 h-72 w-72 rounded-full bg-rose-400/25 blur-[80px]" />
+          <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/3 h-48 w-48 -translate-x-1/2 rounded-full bg-[#c45c80]/20 blur-[70px]" />
+
+          {/* Sparkles */}
+          <span aria-hidden className="pointer-events-none absolute right-8 top-10 select-none text-xl text-rose-300/55">✦</span>
+          <span aria-hidden className="pointer-events-none absolute right-20 top-28 select-none text-xs text-white/20">✦</span>
+          <span aria-hidden className="pointer-events-none absolute bottom-16 right-6 select-none text-sm text-rose-300/35">◆</span>
+          <span aria-hidden className="pointer-events-none absolute left-6 top-16 select-none text-xs text-rose-200/25">✿</span>
+          <span aria-hidden className="pointer-events-none absolute bottom-24 left-10 select-none text-base text-white/15">✦</span>
+
+          {/* Logo — centered, responsive */}
+          <div className="absolute inset-0 flex items-center justify-center p-8">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/logo.png"
+              alt=""
+              aria-hidden="true"
+              className="relative h-auto w-[55%] max-w-[220px] opacity-70 sm:w-[70%] sm:max-w-xs lg:w-[80%] lg:max-w-sm"
+              style={{ mixBlendMode: 'luminosity' }}
+            />
+          </div>
         </section>
 
         <section className="rounded-[2.5rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-8 shadow-[0_28px_90px_rgba(74,44,74,0.08)] sm:p-10">

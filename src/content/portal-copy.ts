@@ -14,7 +14,7 @@ export const portalCopy = {
     subtitle: 'Access your schedule, bookings, and member-only SheGymZ experience.',
     primaryCta: 'Sign in',
     secondaryCta: 'Create member account',
-    helper: 'Already subscribed? Use the same email you used when joining SheGymZ.',
+    helper: 'Already subscribed? Use the same email you used when subscribing to SheGymZ.',
     featureEyebrow: 'Private women\'s wellness club',
     featureTitle: 'A private member space for the work you are doing for yourself.',
     featureLabel: 'Safe. Soft. Strong.',
@@ -22,7 +22,7 @@ export const portalCopy = {
   signup: {
     title: 'Create your member account',
     subtitle:
-      "Use the email you joined SheGymZ with. We'll confirm your membership and send you a secure code.",
+      "Use the email you subscribed to SheGymZ with. We'll confirm your membership and send you a secure code.",
     emailLabel: 'Membership email',
     continueCta: 'Continue',
     loading: 'Confirming your membership...',
@@ -37,7 +37,7 @@ export const portalCopy = {
     resendText: "Didn't receive it? Send a new code.",
     successText: "You're verified. Let's finish setting up your member account.",
     signInInstead: 'Already set up? Use member sign-in instead.',
-    stepEmail: 'Share the email you used when joining SheGymZ.',
+    stepEmail: 'Share the email you used when subscribing to SheGymZ.',
     stepCode: 'Enter the secure code we send to your inbox.',
     stepFinish: 'Finish your member account with a password or Google.',
     codeSentMessage: 'We sent a secure code to {email}. It expires in {minutes} minutes.',

@@ -138,7 +138,7 @@ export default function HomePage() {
                 Already a member?
               </p>
               <p className="relative mt-3 text-sm leading-7 text-white/78">
-                Use the same email you joined with so your membership can be recognised gently and securely.
+                Use the same email you subscribed with so your membership can be recognised gently and securely.
               </p>
               <Link
                 href="/login"
