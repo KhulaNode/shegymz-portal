@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 import type { NextRequest, NextResponse } from 'next/server';
-import { readEnv } from '@/lib/env';
 
 const SIGNUP_CONTINUATION_COOKIE = 'shegymz_portal_signup';
+const SECURE_COOKIES = (process.env.APP_URL ?? '').startsWith('https://');
 const SIGNUP_CONTINUATION_PURPOSE = 'signup-continuation';
 const SIGNUP_CONTINUATION_TTL_SECONDS = 15 * 60;
 
@@ -22,7 +22,7 @@ function base64UrlDecode(value: string) {
 }
 
 function signPayload(value: string) {
-  return crypto.createHmac('sha256', readEnv().AUTH_SECRET).update(value).digest('base64url');
+  return crypto.createHmac('sha256', process.env.AUTH_SECRET!).update(value).digest('base64url');
 }
 
 function buildPayload(args: { email: string; challengeId: string }): SignupContinuationPayload {
@@ -88,7 +88,7 @@ export function issueSignupContinuation(
     value: token,
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    secure: SECURE_COOKIES,
     path: '/',
     maxAge: SIGNUP_CONTINUATION_TTL_SECONDS,
   });
@@ -100,7 +100,7 @@ export function clearSignupContinuation(response: NextResponse) {
     value: '',
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    secure: SECURE_COOKIES,
     path: '/',
     maxAge: 0,
   });

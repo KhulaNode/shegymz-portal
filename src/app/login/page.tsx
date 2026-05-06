@@ -3,20 +3,39 @@
 import { Suspense } from 'react';
 import { FormEvent, useState } from 'react';
 import { signIn } from 'next-auth/react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PortalBrandHeader } from '@/components/portal-brand-header';
+import { portalCopy } from '@/content/portal-copy';
+
+function GoogleMark() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5">
+      <path
+        fill="#4285F4"
+        d="M23.49 12.27c0-.79-.07-1.54-.2-2.27H12v4.3h6.44a5.5 5.5 0 0 1-2.39 3.61v3h3.88c2.27-2.09 3.56-5.17 3.56-8.64Z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 24c3.24 0 5.96-1.07 7.95-2.91l-3.88-3c-1.07.72-2.43 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.27v3.09A12 12 0 0 0 12 24Z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.27 14.28A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.55.38-2.28V6.63H1.27A12 12 0 0 0 0 12c0 1.94.46 3.78 1.27 5.37l4-3.09Z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 4.77c1.76 0 3.34.61 4.58 1.8l3.44-3.44C17.95 1.19 15.24 0 12 0A12 12 0 0 0 1.27 6.63l4 3.09c.95-2.85 3.6-4.95 6.73-4.95Z"
+      />
+    </svg>
+  );
+}
 
 const LOGIN_ERROR_MESSAGES: Record<string, string> = {
-  'account-missing':
-    'This sign-in completed, but there is no portal account for the paid-member email yet. Start with first-time signup.',
-  AccessDenied:
-    'That sign-in path was rejected. Use the same paid-member email that cleared portal signup.',
-  CredentialsSignin:
-    'Login failed. Use the same paid-member email and the password set during signup.',
-  OAuthAccountNotLinked:
-    'That Google account is not linked to this portal user. Use the paid-member email account that completed signup.',
+  'account-missing': 'Please create your member account before signing in.',
+  AccessDenied: 'This area is for active SheGymZ members. Please use the email connected to your membership.',
+  CredentialsSignin: portalCopy.login.error,
+  OAuthAccountNotLinked: 'Please use the Google account connected to your SheGymZ member account.',
 };
 
 function LoginPageContent() {
@@ -46,10 +65,7 @@ function LoginPageContent() {
     setIsLoading(false);
 
     if (!result || result.error) {
-      setError(
-        LOGIN_ERROR_MESSAGES[result?.error ?? 'CredentialsSignin'] ??
-          'Login failed. Use the same paid-member email and the password set during signup.',
-      );
+      setError(LOGIN_ERROR_MESSAGES[result?.error ?? 'CredentialsSignin'] ?? portalCopy.login.error);
       return;
     }
 
@@ -58,58 +74,50 @@ function LoginPageContent() {
   }
 
   return (
-    <main className="min-h-screen px-6 py-8 sm:px-8 lg:px-10">
-      <PortalBrandHeader accent="Returning Member Access" />
-      <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_0.95fr]">
-        <section className="relative overflow-hidden rounded-[2.5rem] shadow-[0_24px_80px_rgba(53,18,41,0.12)]">
-          <Image
-            src="/images/IMG_3757.jpeg"
-            alt="SheGymZ member space"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-plum-900/82 via-plum-900/48 to-plum-900/20" />
-          <div className="relative flex min-h-[620px] flex-col justify-end p-8 text-white sm:p-10">
-            <p className="text-sm font-semibold uppercase tracking-[0.32em] text-white/68">
-              Returning Members
-            </p>
-            <h1 className="mt-4 max-w-xl text-4xl font-semibold leading-tight sm:text-5xl">
-              Welcome back to your SheGymZ space.
-            </h1>
-            <p className="mt-5 max-w-lg text-base leading-8 text-white/84 sm:text-lg">
-              A quiet return to your schedule, your rhythm, and the work you are doing for
-              yourself.
-            </p>
-            <div className="mt-8 grid gap-3 sm:max-w-lg">
-              <div className="rounded-2xl border border-white/12 bg-white/10 px-4 py-4 text-sm text-white/82">
-                Quiet, familiar, and easy to return to.
-              </div>
-              <div className="rounded-2xl border border-white/12 bg-white/10 px-4 py-4 text-sm text-white/82">
-                Straight back into your SheGymZ flow.
-              </div>
-              {nextParam?.startsWith('/') && (
-                <div className="rounded-2xl border border-white/18 bg-white/14 px-4 py-4 text-sm text-white">
-                  Protected destination waiting after login: <span className="font-semibold">{nextParam}</span>
-                </div>
-              )}
-            </div>
+    <main className="portal-shell min-h-screen px-5 py-6 sm:px-8 lg:px-10">
+      <PortalBrandHeader accent="Returning member" />
+      <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1fr_0.95fr]">
+        <section className="relative min-h-[260px] overflow-hidden rounded-[2rem] border border-plum-900/10 bg-gradient-to-br from-[#6f466f] via-[#5d395f] to-[#452948] shadow-[0_32px_100px_rgba(53,18,41,0.28)] sm:min-h-[360px] sm:rounded-[2.5rem] lg:min-h-[650px]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(232,181,195,0.07),_transparent_24%),radial-gradient(circle_at_bottom,_rgba(255,255,255,0.03),_transparent_28%)]" />
+
+          {/* Ambient glow orbs */}
+          <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-[#9b3a72]/50 blur-[90px]" />
+          <div aria-hidden className="pointer-events-none absolute -left-16 bottom-16 h-72 w-72 rounded-full bg-rose-400/25 blur-[80px]" />
+          <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/3 h-48 w-48 -translate-x-1/2 rounded-full bg-[#c45c80]/20 blur-[70px]" />
+
+          {/* Sparkles */}
+          <span aria-hidden className="pointer-events-none absolute right-8 top-10 select-none text-xl text-rose-300/55">✦</span>
+          <span aria-hidden className="pointer-events-none absolute right-20 top-28 select-none text-xs text-white/20">✦</span>
+          <span aria-hidden className="pointer-events-none absolute bottom-16 right-6 select-none text-sm text-rose-300/35">◆</span>
+          <span aria-hidden className="pointer-events-none absolute left-6 top-16 select-none text-xs text-rose-200/25">✿</span>
+          <span aria-hidden className="pointer-events-none absolute bottom-24 left-10 select-none text-base text-white/15">✦</span>
+
+          {/* Logo — centered, responsive */}
+          <div className="absolute inset-0 flex items-center justify-center p-8">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/logo.png"
+              alt=""
+              aria-hidden="true"
+              className="relative h-auto w-[55%] max-w-[220px] opacity-70 sm:w-[70%] sm:max-w-xs lg:w-[80%] lg:max-w-sm"
+              style={{ mixBlendMode: 'luminosity' }}
+            />
           </div>
         </section>
 
-        <section className="rounded-[2.5rem] border border-plum-100/80 bg-white/92 p-8 shadow-[0_24px_80px_rgba(53,18,41,0.08)] backdrop-blur sm:p-10">
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-plum-700">
-            Login
+        <section className="rounded-[2.5rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-8 shadow-[0_28px_90px_rgba(74,44,74,0.08)] sm:p-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-plum-700">
+            Sign in
           </p>
-          <h2 className="mt-4 text-3xl font-bold text-plum-900 sm:text-4xl">
-            Sign in.
+          <h2 className="mt-4 text-3xl font-semibold text-plum-900 sm:text-4xl">
+            {portalCopy.login.title}
           </h2>
           <p className="mt-4 text-base leading-8 text-plum-800 sm:text-lg">
-            Return with the account you created when you first activated your access.
+            {portalCopy.login.subtitle}
           </p>
 
           {routeErrorMessage && (
-            <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-800">
+            <div className="mt-6 rounded-2xl border border-rose-100 bg-rose-50 px-4 py-4 text-sm leading-7 text-plum-800">
               {routeErrorMessage}
             </div>
           )}
@@ -117,14 +125,14 @@ function LoginPageContent() {
           <form onSubmit={handleCredentialsLogin} className="mt-8 space-y-5">
             <div>
               <label htmlFor="email" className="mb-2 block text-sm font-semibold text-plum-900">
-                Paid-member email
+                Membership email
               </label>
               <input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-2xl border border-plum-200 bg-sand/35 px-4 py-3 text-base outline-none transition focus:border-plum-700"
+                className="w-full rounded-2xl border border-warmgray-300 bg-white px-4 py-3 text-base outline-none transition focus:border-plum-700"
                 placeholder="you@example.com"
                 required
               />
@@ -139,39 +147,44 @@ function LoginPageContent() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-2xl border border-plum-200 bg-sand/35 px-4 py-3 text-base outline-none transition focus:border-plum-700"
+                className="w-full rounded-2xl border border-warmgray-300 bg-white px-4 py-3 text-base outline-none transition focus:border-plum-700"
                 placeholder="Your password"
                 required
               />
             </div>
 
-            {error && <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+            {error && (
+              <div className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm leading-7 text-plum-800">
+                {error}
+              </div>
+            )}
 
-            <div className="flex flex-wrap gap-3">
+            <div className="grid gap-3">
               <button
                 type="submit"
                 disabled={isLoading}
-                className="rounded-full bg-plum-900 px-6 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                className="rounded-full bg-plum-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-plum-800 disabled:opacity-60"
               >
-                {isLoading ? 'Logging in...' : 'Login with password'}
+                {isLoading ? portalCopy.login.loading : portalCopy.login.emailButton}
               </button>
               <button
                 type="button"
                 onClick={() => signIn('google', { callbackUrl })}
-                className="rounded-full border border-plum-300 px-6 py-3 text-sm font-semibold text-plum-900"
+                className="inline-flex items-center justify-center gap-3 rounded-full border border-warmgray-300 bg-white px-6 py-3 text-sm font-semibold text-plum-900 transition hover:border-rose-300 hover:bg-rose-50"
               >
-                Continue with Google
+                <GoogleMark />
+                {portalCopy.login.googleButton}
               </button>
             </div>
           </form>
 
-          <div className="mt-8 rounded-[1.75rem] border border-plum-100 bg-[#faf7f4] p-5 text-sm leading-7 text-plum-800">
-            New to the portal?{' '}
+          <div className="mt-8 rounded-[1.75rem] border border-warmgray-200 bg-warmgray-50 p-5 text-sm leading-7 text-plum-800">
+            {portalCopy.login.helper}{' '}
             <Link
               href={nextParam?.startsWith('/') ? `/signup?next=${encodeURIComponent(nextParam)}` : '/signup'}
               className="font-semibold text-plum-900"
             >
-              Activate your access
+              {portalCopy.nav.signup}
             </Link>
             .
           </div>

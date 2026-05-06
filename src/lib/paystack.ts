@@ -41,6 +41,15 @@ interface PaystackCustomerResponse {
 }
 
 const PAYSTACK_API_BASE = 'https://api.paystack.co';
+const FETCH_TIMEOUT_MS = 8000;
+
+function fetchWithTimeout(url: string, options: RequestInit): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() =>
+    clearTimeout(timer),
+  );
+}
 
 export async function lookupActiveMembershipByEmail(
   email: string,
@@ -48,6 +57,11 @@ export async function lookupActiveMembershipByEmail(
   const secretKey = process.env.PAYSTACK_SECRET_KEY ?? '';
   const planCode = process.env.PAYSTACK_PLAN_CODE?.trim();
   const normalizedEmail = email.trim().toLowerCase();
+
+  // Dev escape hatch: set DEV_SKIP_MEMBERSHIP_CHECK=true in .env.local to bypass Paystack
+  if (process.env.DEV_SKIP_MEMBERSHIP_CHECK === 'true') {
+    return { isActive: true, matchedEmail: normalizedEmail };
+  }
 
   if (!secretKey) {
     return {
@@ -58,7 +72,7 @@ export async function lookupActiveMembershipByEmail(
   }
 
   try {
-    const customerResponse = await fetch(
+    const customerResponse = await fetchWithTimeout(
       `${PAYSTACK_API_BASE}/customer/${encodeURIComponent(normalizedEmail)}`,
       {
         headers: {
@@ -93,7 +107,7 @@ export async function lookupActiveMembershipByEmail(
       };
     }
 
-    const transactionResponse = await fetch(
+    const transactionResponse = await fetchWithTimeout(
       `${PAYSTACK_API_BASE}/transaction?perPage=50&status=success`,
       {
         headers: {
