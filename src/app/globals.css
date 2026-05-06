@@ -5,55 +5,74 @@
 :root {
   color-scheme: light;
   --scheduler-radius: 24px;
-  --scheduler-background: 255 255 255;
-  --scheduler-foreground: 53 18 41;
-  --scheduler-card: 255 255 255;
-  --scheduler-card-foreground: 53 18 41;
-  --scheduler-popover: 255 255 255;
-  --scheduler-popover-foreground: 53 18 41;
-  --scheduler-primary: 102 34 79;
-  --scheduler-primary-foreground: 245 241 236;
-  --scheduler-secondary: 243 223 241;
-  --scheduler-secondary-foreground: 53 18 41;
-  --scheduler-secondary-500: 102 34 79;
-  --scheduler-muted: 250 245 250;
-  --scheduler-muted-foreground: 102 34 79;
-  --scheduler-accent: 243 223 241;
-  --scheduler-accent-foreground: 53 18 41;
+  --scheduler-background: 250 248 247;
+  --scheduler-foreground: 74 44 74;
+  --scheduler-card: 255 251 249;
+  --scheduler-card-foreground: 74 44 74;
+  --scheduler-popover: 255 251 249;
+  --scheduler-popover-foreground: 74 44 74;
+  --scheduler-primary: 74 44 74;
+  --scheduler-primary-foreground: 250 248 247;
+  --scheduler-secondary: 245 230 232;
+  --scheduler-secondary-foreground: 74 44 74;
+  --scheduler-secondary-500: 107 61 107;
+  --scheduler-muted: 245 242 240;
+  --scheduler-muted-foreground: 107 61 107;
+  --scheduler-accent: 240 205 213;
+  --scheduler-accent-foreground: 74 44 74;
   --scheduler-destructive: 185 28 28;
   --scheduler-destructive-foreground: 255 255 255;
-  --scheduler-border: 225 206 220;
-  --scheduler-input: 225 206 220;
-  --scheduler-ring: 102 34 79;
-  --scheduler-default-50: 250 245 250;
-  --scheduler-default-100: 243 223 241;
-  --scheduler-default-200: 232 214 228;
-  --scheduler-default-400: 188 144 174;
-  --portal-warmgray-50: 248 244 240;
-  --portal-warmgray-100: 237 230 224;
-  --portal-warmgray-600: 126 107 100;
+  --scheduler-border: 221 212 206;
+  --scheduler-input: 221 212 206;
+  --scheduler-ring: 107 61 107;
+  --scheduler-default-50: 250 248 247;
+  --scheduler-default-100: 245 230 232;
+  --scheduler-default-200: 235 230 226;
+  --scheduler-default-400: 201 186 178;
+  --portal-warmgray-50: 250 248 247;
+  --portal-warmgray-100: 245 242 240;
+  --portal-warmgray-600: 157 141 127;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 12% 8%, rgba(243, 223, 241, 0.72), transparent 28%),
-    radial-gradient(circle at 88% 0%, rgba(255, 222, 225, 0.58), transparent 30%),
-    linear-gradient(145deg, #fffdfb 0%, #faf7f4 42%, #f3ece6 100%);
-  color: #351229;
-  font-family: Georgia, "Times New Roman", serif;
+    radial-gradient(circle at 12% 8%, rgba(240, 205, 213, 0.26), transparent 24%),
+    radial-gradient(circle at 88% 0%, rgba(232, 181, 195, 0.18), transparent 26%),
+    linear-gradient(180deg, #fcfaf9 0%, #f7f2ef 100%);
+  color: #4a2c4a;
+  font-family: system-ui, sans-serif;
+  font-feature-settings: 'kern' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: #4a2c4a;
 }
 
 button,
 input,
 select,
 textarea {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: inherit;
 }
 
 ::selection {
-  background: rgba(243, 223, 241, 0.9);
-  color: #351229;
+  background: rgba(232, 181, 195, 0.55);
+  color: #4a2c4a;
 }
 
 a {
@@ -75,4 +94,23 @@ a {
 
 .border-warmgray-100 {
   border-color: rgb(var(--portal-warmgray-100));
+}
+
+.portal-shell {
+  position: relative;
+}
+
+.portal-shell::after {
+  content: "";
+  position: fixed;
+  left: 50%;
+  top: 120px;
+  z-index: -1;
+  height: 360px;
+  width: min(72vw, 920px);
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(232, 181, 195, 0.18) 0%, rgba(255, 255, 255, 0) 74%);
+  filter: blur(18px);
+  pointer-events: none;
 }

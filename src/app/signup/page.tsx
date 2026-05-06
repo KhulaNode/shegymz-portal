@@ -9,6 +9,29 @@ import { useSearchParams } from 'next/navigation';
 import { PortalBrandHeader } from '@/components/portal-brand-header';
 import { portalCopy } from '@/content/portal-copy';
 
+function GoogleMark() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5">
+      <path
+        fill="#4285F4"
+        d="M23.49 12.27c0-.79-.07-1.54-.2-2.27H12v4.3h6.44a5.5 5.5 0 0 1-2.39 3.61v3h3.88c2.27-2.09 3.56-5.17 3.56-8.64Z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 24c3.24 0 5.96-1.07 7.95-2.91l-3.88-3c-1.07.72-2.43 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.27v3.09A12 12 0 0 0 12 24Z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.27 14.28A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.55.38-2.28V6.63H1.27A12 12 0 0 0 0 12c0 1.94.46 3.78 1.27 5.37l4-3.09Z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 4.77c1.76 0 3.34.61 4.58 1.8l3.44-3.44C17.95 1.19 15.24 0 12 0A12 12 0 0 0 1.27 6.63l4 3.09c.95-2.85 3.6-4.95 6.73-4.95Z"
+      />
+    </svg>
+  );
+}
+
 type Step = 'email' | 'no-membership' | 'otp' | 'verified' | 'account-created';
 type VerifyOtpResponse = {
   error?: string;
@@ -27,7 +50,7 @@ const SIGNUP_AUTH_ERROR_MESSAGES: Record<string, string> = {
   'google-account-already-linked': 'That Google account is already connected to another member account.',
 };
 
-function friendlySignupError(error: string | undefined, fallback = portalCopy.safeErrors.default) {
+function friendlySignupError(error: string | undefined, fallback: string = portalCopy.safeErrors.default) {
   const normalised = error?.toLowerCase() ?? '';
 
   if (normalised.includes('no active') || normalised.includes('membership')) {
@@ -49,6 +72,10 @@ function friendlySignupError(error: string | undefined, fallback = portalCopy.sa
   }
 
   return fallback;
+}
+
+function formatCopy(template: string, values: Record<string, string | number | undefined>) {
+  return template.replace(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? ''));
 }
 
 function SignupPageContent() {
@@ -89,11 +116,16 @@ function SignupPageContent() {
         return;
       }
 
-      throw new Error(friendlySignupError(data.error, 'We could not send your secure code just now. Please try again.'));
+      throw new Error(friendlySignupError(data.error, portalCopy.safeErrors.requestCode));
     }
 
     setStep('otp');
-    setMessage(`We sent a secure code to ${data.email ?? email}. It expires in ${data.expiresInMinutes} minutes.`);
+    setMessage(
+      formatCopy(portalCopy.signup.codeSentMessage, {
+        email: data.email ?? email,
+        minutes: data.expiresInMinutes,
+      }),
+    );
   }
 
   async function handleRequestOtp(e: FormEvent<HTMLFormElement>) {
@@ -174,11 +206,15 @@ function SignupPageContent() {
 
       const data = (await response.json().catch(() => ({}))) as PasswordAccountResponse;
       if (!response.ok) {
-        throw new Error(friendlySignupError(data.error, 'We could not create your member account just now. Please try again.'));
+        throw new Error(friendlySignupError(data.error, portalCopy.safeErrors.createAccount));
       }
 
       setStep('account-created');
-      setMessage(`Your member account is ready for ${data.loginEmail ?? email}. You can sign in now.`);
+      setMessage(
+        formatCopy(portalCopy.signup.accountReadyMessage, {
+          email: data.loginEmail ?? email,
+        }),
+      );
       setPassword('');
       setConfirmPassword('');
     } catch (err) {
@@ -189,10 +225,10 @@ function SignupPageContent() {
   }
 
   return (
-    <main className="min-h-screen px-5 py-6 sm:px-8 lg:px-10">
-      <PortalBrandHeader accent="Create Member Account" />
+    <main className="portal-shell min-h-screen px-5 py-6 sm:px-8 lg:px-10">
+      <PortalBrandHeader accent="Create member account" />
       <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-        <section className="relative min-h-[380px] overflow-hidden rounded-[2.5rem] shadow-[0_28px_90px_rgba(53,18,41,0.13)] lg:min-h-[720px]">
+        <section className="relative min-h-[380px] overflow-hidden rounded-[2.5rem] shadow-[0_28px_90px_rgba(74,44,74,0.12)] lg:min-h-[720px]">
           <Image
             src="/images/showcase1.jpeg"
             alt="SheGymZ member onboarding"
@@ -200,7 +236,7 @@ function SignupPageContent() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-plum-900/86 via-plum-900/55 to-plum-900/18" />
+          <div className="absolute inset-0 bg-gradient-to-r from-plum-900/84 via-plum-900/46 to-plum-900/18" />
           <div className="relative flex min-h-[380px] flex-col justify-end p-8 text-white sm:p-10 lg:min-h-[720px]">
             <p className="text-xs font-semibold uppercase tracking-[0.32em] text-white/68">
               Member onboarding
@@ -214,13 +250,13 @@ function SignupPageContent() {
 
             <div className="mt-8 space-y-3 sm:max-w-lg">
               <div className={`rounded-2xl border px-4 py-4 text-sm leading-7 ${step === 'email' || step === 'no-membership' ? 'border-white/22 bg-white/14 text-white' : 'border-white/10 bg-white/8 text-white/72'}`}>
-                1. Share the email you used when joining SheGymZ.
+                1. {portalCopy.signup.stepEmail}
               </div>
               <div className={`rounded-2xl border px-4 py-4 text-sm leading-7 ${step === 'otp' ? 'border-white/22 bg-white/14 text-white' : 'border-white/10 bg-white/8 text-white/72'}`}>
-                2. Enter the secure code we send to your inbox.
+                2. {portalCopy.signup.stepCode}
               </div>
               <div className={`rounded-2xl border px-4 py-4 text-sm leading-7 ${step === 'verified' || step === 'account-created' ? 'border-white/22 bg-white/14 text-white' : 'border-white/10 bg-white/8 text-white/72'}`}>
-                3. Finish your member account with a password or Google.
+                3. {portalCopy.signup.stepFinish}
               </div>
             </div>
 
@@ -234,7 +270,7 @@ function SignupPageContent() {
           </div>
         </section>
 
-        <section className="rounded-[2.5rem] border border-white/75 bg-white/92 p-8 shadow-[0_28px_90px_rgba(53,18,41,0.09)] backdrop-blur-xl sm:p-10">
+        <section className="rounded-[2.5rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-8 shadow-[0_28px_90px_rgba(74,44,74,0.08)] sm:p-10">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-plum-700">
             Member account
           </p>
@@ -262,7 +298,7 @@ function SignupPageContent() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-2xl border border-plum-200 bg-sand/40 px-4 py-3 text-base outline-none ring-0 transition focus:border-plum-700"
+                  className="w-full rounded-2xl border border-warmgray-300 bg-white px-4 py-3 text-base outline-none ring-0 transition focus:border-plum-700"
                   placeholder="you@example.com"
                   required
                 />
@@ -285,7 +321,7 @@ function SignupPageContent() {
           )}
 
           {step === 'no-membership' && (
-            <div className="mt-8 rounded-[2rem] border border-rose-100 bg-rose-50/80 p-6">
+            <div className="mt-8 rounded-[2rem] border border-rose-200 bg-rose-50 p-6">
               <h3 className="text-2xl font-semibold leading-tight text-plum-900">
                 {portalCopy.signup.noMembershipTitle}
               </h3>
@@ -306,7 +342,7 @@ function SignupPageContent() {
                 </button>
                 <Link
                   href={portalCopy.external.shegymzUrl}
-                  className="rounded-full border border-plum-200 bg-white px-6 py-3 text-center text-sm font-semibold text-plum-900 transition hover:border-plum-400"
+                  className="rounded-full border border-warmgray-300 bg-white px-6 py-3 text-center text-sm font-semibold text-plum-900 transition hover:border-rose-300"
                 >
                   {portalCopy.signup.goToSheGymZ}
                 </Link>
@@ -317,7 +353,7 @@ function SignupPageContent() {
           {step === 'otp' && (
             <form onSubmit={handleVerifyOtp} className="mt-8 space-y-5">
               {message && (
-                <div className="rounded-2xl border border-plum-100 bg-[#faf7f4] px-4 py-4 text-sm leading-7 text-plum-900">
+                <div className="rounded-2xl border border-warmgray-200 bg-warmgray-50 px-4 py-4 text-sm leading-7 text-plum-900">
                   {message}
                 </div>
               )}
@@ -333,7 +369,7 @@ function SignupPageContent() {
                   maxLength={6}
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                  className="w-full rounded-2xl border border-plum-200 bg-sand/40 px-4 py-3 text-base tracking-[0.3em] outline-none transition focus:border-plum-700"
+                  className="w-full rounded-2xl border border-warmgray-300 bg-white px-4 py-3 text-base tracking-[0.3em] outline-none transition focus:border-plum-700"
                   placeholder="000000"
                   required
                 />
@@ -351,13 +387,13 @@ function SignupPageContent() {
                   disabled={isLoading}
                   className="rounded-full bg-plum-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-plum-800 disabled:opacity-60"
                 >
-                  {isLoading ? 'Checking your code...' : portalCopy.signup.verifyCodeCta}
+                  {isLoading ? portalCopy.signup.verifyLoading : portalCopy.signup.verifyCodeCta}
                 </button>
                 <button
                   type="button"
                   onClick={handleResendCode}
                   disabled={isLoading}
-                  className="rounded-full border border-plum-200 bg-white px-6 py-3 text-sm font-semibold text-plum-900 transition hover:border-plum-400 disabled:opacity-60"
+                  className="rounded-full border border-warmgray-300 bg-white px-6 py-3 text-sm font-semibold text-plum-900 transition hover:border-rose-300 disabled:opacity-60"
                 >
                   {portalCopy.signup.resendText}
                 </button>
@@ -370,35 +406,35 @@ function SignupPageContent() {
               <div className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-4 text-sm leading-7 text-emerald-900">
                 {message}
               </div>
-              <div className="rounded-[1.75rem] border border-plum-100 bg-[#faf7f4] p-5 text-sm leading-7 text-plum-900">
-                Your account will be connected to <span className="font-semibold">{email}</span>.
+              <div className="rounded-[1.75rem] border border-warmgray-200 bg-warmgray-50 p-5 text-sm leading-7 text-plum-900">
+                {portalCopy.signup.accountConnectedPrefix} <span className="font-semibold">{email}</span>.
               </div>
-              <form onSubmit={handleCreatePasswordAccount} className="space-y-5 rounded-3xl border border-plum-100 bg-sand/25 p-5">
+              <form onSubmit={handleCreatePasswordAccount} className="space-y-5 rounded-3xl border border-warmgray-200 bg-warmgray-50/80 p-5">
                 <div>
                   <label htmlFor="name" className="mb-2 block text-sm font-semibold text-plum-900">
-                    Full name
+                    {portalCopy.signup.fullNameLabel}
                   </label>
                   <input
                     id="name"
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full rounded-2xl border border-plum-200 bg-white px-4 py-3 text-base outline-none transition focus:border-plum-700"
-                    placeholder="Your name"
+                    className="w-full rounded-2xl border border-warmgray-300 bg-white px-4 py-3 text-base outline-none transition focus:border-plum-700"
+                    placeholder={portalCopy.signup.fullNamePlaceholder}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="password" className="mb-2 block text-sm font-semibold text-plum-900">
-                    Create password
+                    {portalCopy.signup.passwordLabel}
                   </label>
                   <input
                     id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-2xl border border-plum-200 bg-white px-4 py-3 text-base outline-none transition focus:border-plum-700"
-                    placeholder="At least 8 characters"
+                    className="w-full rounded-2xl border border-warmgray-300 bg-white px-4 py-3 text-base outline-none transition focus:border-plum-700"
+                    placeholder={portalCopy.signup.passwordPlaceholder}
                     minLength={8}
                     required
                   />
@@ -409,15 +445,15 @@ function SignupPageContent() {
                     htmlFor="confirmPassword"
                     className="mb-2 block text-sm font-semibold text-plum-900"
                   >
-                    Confirm password
+                    {portalCopy.signup.confirmPasswordLabel}
                   </label>
                   <input
                     id="confirmPassword"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full rounded-2xl border border-plum-200 bg-white px-4 py-3 text-base outline-none transition focus:border-plum-700"
-                    placeholder="Repeat password"
+                    className="w-full rounded-2xl border border-warmgray-300 bg-white px-4 py-3 text-base outline-none transition focus:border-plum-700"
+                    placeholder={portalCopy.signup.confirmPasswordPlaceholder}
                     minLength={8}
                     required
                   />
@@ -435,19 +471,20 @@ function SignupPageContent() {
                     disabled={isLoading}
                     className="rounded-full bg-plum-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-plum-800 disabled:opacity-60"
                   >
-                    {isLoading ? 'Creating your account...' : 'Create account with password'}
+                    {isLoading ? portalCopy.signup.createAccountLoading : portalCopy.signup.createPasswordCta}
                   </button>
                   <button
                     type="button"
                     onClick={() => signIn('google', { callbackUrl })}
-                    className="rounded-full border border-plum-200 bg-white px-6 py-3 text-sm font-semibold text-plum-900 transition hover:border-plum-400 hover:bg-plum-50"
+                    className="inline-flex items-center justify-center gap-3 rounded-full border border-warmgray-300 bg-white px-6 py-3 text-sm font-semibold text-plum-900 transition hover:border-rose-300 hover:bg-rose-50"
                   >
-                    Continue with Google
+                    <GoogleMark />
+                    {portalCopy.signup.googleFinishCta}
                   </button>
                 </div>
 
                 <p className="text-sm leading-7 text-plum-700">
-                  For your privacy, use the Google account connected to <span className="font-semibold">{email}</span>.
+                  {portalCopy.signup.googleHintPrefix} <span className="font-semibold">{email}</span>.
                 </p>
               </form>
             </div>
