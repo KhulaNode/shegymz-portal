@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { requireProtectedMember } from '@/lib/protected-member';
 import { KhulaSchedulerShell } from '@/components/khula-scheduler-shell';
-import { PortalBrandHeader } from '@/components/portal-brand-header';
+import { LogoutButton } from '@/components/logout-button';
 import { portalCopy } from '@/content/portal-copy';
 
 export default async function SchedulePage() {
@@ -10,7 +10,26 @@ export default async function SchedulePage() {
 
   return (
     <main className="portal-shell min-h-screen px-5 py-6 sm:px-8 lg:px-10">
-      <PortalBrandHeader accent="Mina Scheduler" />
+
+      {/* ── Signed-in header ─────────────────────────────── */}
+      <header className="mb-5 sm:mb-8">
+        <div className="mx-auto flex max-w-7xl flex-row items-center justify-between gap-3 rounded-[1.5rem] sm:rounded-[2rem] border border-warmgray-200/80 bg-[#fffaf8]/96 px-4 py-3 shadow-[0_18px_60px_rgba(74,44,74,0.08)] sm:px-6 sm:py-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <Image
+              src="/images/logo.png"
+              alt="SheGymZ"
+              width={132}
+              height={52}
+              className="h-9 w-auto object-contain sm:h-10"
+              priority
+            />
+            <span className="hidden truncate text-sm font-medium text-plum-900/90 sm:block">
+              {portalCopy.schedule.eyebrow}
+            </span>
+          </div>
+          <LogoutButton />
+        </div>
+      </header>
       <div className="mx-auto max-w-7xl space-y-6">
         <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="rounded-[2.5rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-8 shadow-[0_28px_90px_rgba(74,44,74,0.08)] sm:p-10">
@@ -51,7 +70,9 @@ export default async function SchedulePage() {
             </div>
           </div>
         </section>
-        <KhulaSchedulerShell />
+        <div className="-mx-5 sm:mx-0">
+          <KhulaSchedulerShell />
+        </div>
       </div>
     </main>
   );

@@ -38,6 +38,14 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Shrink the scheduler's internal "Week N" label on mobile */
+@media (max-width: 639px) {
+  .khula-mobile-shell .grid-cols-8 > *:first-child span {
+    font-size: 0.6rem;
+    line-height: 1;
+  }
+}
+
 body {
   margin: 0;
   background:

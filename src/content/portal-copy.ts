@@ -68,9 +68,9 @@ export const portalCopy = {
     title: 'Your SheGymZ space',
     subtitle:
       'Book your sessions, check your schedule, and stay connected to your private wellness space.',
-    schedulerTitle: 'Mina Scheduler',
+    schedulerTitle: 'Schedule',
     schedulerDescription: 'Manage your sessions and stay up to date with your SheGymZ schedule.',
-    schedulerCta: 'Open Scheduler',
+    schedulerCta: 'View schedule',
     membershipTitle: 'Membership',
     membershipDescription: 'Your active membership gives you access to the SheGymZ member portal.',
     statusLabel: 'Active',
@@ -89,7 +89,7 @@ export const portalCopy = {
     privateAccessTitle: 'Your space is here when your membership is active.',
   },
   schedule: {
-    eyebrow: 'Mina Scheduler',
+    eyebrow: 'Your schedule',
     title: 'Make space for yourself.',
     subtitle: 'Manage your sessions and stay up to date with your SheGymZ schedule.',
     backCta: 'Back to your SheGymZ space',
