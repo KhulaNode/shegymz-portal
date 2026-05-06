@@ -35,12 +35,12 @@ export async function sendPortalOtpEmail(args: {
 }): Promise<void> {
   await sendEmail({
     to: args.email,
-    subject: 'Your SheGymZ Portal verification code',
+    subject: 'Your SheGymZ secure code',
     body: `
-      <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto;">
-        <h2 style="color:#351229;">Verify your SheGymZ portal signup</h2>
-        <p>Use the verification code below to continue your first-time portal signup.</p>
-        <div style="margin:24px 0;padding:18px 24px;background:#f5f1ec;border-radius:12px;font-size:32px;font-weight:bold;letter-spacing:0.25em;text-align:center;color:#351229;">
+      <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; color:#351229;">
+        <h2 style="color:#351229;">Your SheGymZ secure code</h2>
+        <p>Use the secure code below to continue creating your member account.</p>
+        <div style="margin:24px 0;padding:18px 24px;background:#f5f1ec;border-radius:16px;font-size:32px;font-weight:bold;letter-spacing:0.25em;text-align:center;color:#351229;">
           ${args.otpCode}
         </div>
         <p>This code expires in ${args.expiresInMinutes} minutes.</p>

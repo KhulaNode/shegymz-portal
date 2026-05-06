@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'SheGymZ Portal',
-  description: 'Member portal for subscribed SheGymZ clients.',
+  title: 'SheGymZ Member Space',
+  description: 'Private member space for SheGymZ scheduling, bookings, and wellness access.',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

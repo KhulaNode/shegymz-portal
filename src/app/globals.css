@@ -37,9 +37,17 @@
 body {
   margin: 0;
   background:
-    radial-gradient(circle at top, rgba(243, 223, 241, 0.48), transparent 34%),
-    linear-gradient(180deg, #fcfaf8 0%, #f5f1ec 100%);
+    radial-gradient(circle at 12% 8%, rgba(243, 223, 241, 0.72), transparent 28%),
+    radial-gradient(circle at 88% 0%, rgba(255, 222, 225, 0.58), transparent 30%),
+    linear-gradient(145deg, #fffdfb 0%, #faf7f4 42%, #f3ece6 100%);
   color: #351229;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+button,
+input,
+select,
+textarea {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
