@@ -41,9 +41,11 @@ html {
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 12% 8%, rgba(240, 205, 213, 0.26), transparent 24%),
-    radial-gradient(circle at 88% 0%, rgba(232, 181, 195, 0.18), transparent 26%),
-    linear-gradient(180deg, #fcfaf9 0%, #f7f2ef 100%);
+    radial-gradient(ellipse 70% 50% at 8% 0%, rgba(232, 150, 185, 0.22), transparent 55%),
+    radial-gradient(ellipse 60% 45% at 92% 0%, rgba(181, 84, 138, 0.14), transparent 50%),
+    radial-gradient(ellipse 80% 40% at 50% 100%, rgba(240, 205, 213, 0.28), transparent 60%),
+    radial-gradient(ellipse 40% 30% at 75% 45%, rgba(245, 198, 212, 0.16), transparent 55%),
+    linear-gradient(170deg, #fdf8f6 0%, #faf2f6 40%, #f7eef2 100%);
   color: #4a2c4a;
   font-family: system-ui, sans-serif;
   font-feature-settings: 'kern' 1;
@@ -100,17 +102,31 @@ a {
   position: relative;
 }
 
+.portal-shell::before {
+  content: "";
+  position: fixed;
+  right: -120px;
+  top: -80px;
+  z-index: -1;
+  height: 560px;
+  width: 560px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(181, 84, 138, 0.12) 0%, rgba(232, 150, 185, 0.06) 50%, transparent 75%);
+  filter: blur(60px);
+  pointer-events: none;
+}
+
 .portal-shell::after {
   content: "";
   position: fixed;
   left: 50%;
-  top: 120px;
+  top: 80px;
   z-index: -1;
-  height: 360px;
-  width: min(72vw, 920px);
+  height: 520px;
+  width: min(80vw, 1100px);
   transform: translateX(-50%);
   border-radius: 9999px;
-  background: radial-gradient(circle, rgba(232, 181, 195, 0.18) 0%, rgba(255, 255, 255, 0) 74%);
-  filter: blur(18px);
+  background: radial-gradient(ellipse, rgba(232, 181, 195, 0.22) 0%, rgba(245, 198, 212, 0.10) 50%, rgba(255, 255, 255, 0) 76%);
+  filter: blur(24px);
   pointer-events: none;
 }
