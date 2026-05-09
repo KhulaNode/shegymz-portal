@@ -4,9 +4,63 @@ import { requireProtectedMember } from '@/lib/protected-member';
 import { KhulaSchedulerShell } from '@/components/khula-scheduler-shell';
 import { LogoutButton } from '@/components/logout-button';
 import { portalCopy } from '@/content/portal-copy';
+import { getMemberScheduleSnapshot } from '@/lib/member-sessions';
 
-export default async function SchedulePage() {
-  await requireProtectedMember();
+type SchedulePageProps = {
+  searchParams?: Promise<{
+    trainer?: string;
+    notice?: string;
+    error?: string;
+  }>;
+};
+
+function resolveFeedbackBanner(notice?: string, error?: string) {
+  if (notice === 'booking-confirmed') {
+    return {
+      tone: 'success' as const,
+      message: portalCopy.schedule.noticeBookingConfirmed,
+    };
+  }
+
+  if (notice === 'session-cancelled') {
+    return {
+      tone: 'success' as const,
+      message: portalCopy.schedule.noticeSessionCancelled,
+    };
+  }
+
+  switch (error) {
+    case 'slot-unavailable':
+      return { tone: 'error' as const, message: portalCopy.schedule.errorSlotUnavailable };
+    case 'slot-started':
+      return { tone: 'error' as const, message: portalCopy.schedule.errorSlotStarted };
+    case 'booking-conflict':
+      return { tone: 'error' as const, message: portalCopy.schedule.errorBookingConflict };
+    case 'cancel-window-closed':
+      return { tone: 'error' as const, message: portalCopy.schedule.errorCancelWindowClosed };
+    case 'cancel-not-allowed':
+      return { tone: 'error' as const, message: portalCopy.schedule.errorCancelNotAllowed };
+    case 'booking-failed':
+      return { tone: 'error' as const, message: portalCopy.schedule.errorBookingFailed };
+    case 'cancel-failed':
+      return { tone: 'error' as const, message: portalCopy.schedule.errorCancelFailed };
+    default:
+      return null;
+  }
+}
+
+export default async function SchedulePage({ searchParams }: SchedulePageProps) {
+  const member = await requireProtectedMember();
+  const params = (await searchParams) ?? {};
+  const scheduleSnapshot = await getMemberScheduleSnapshot(member.id);
+
+  const selectedTrainerId =
+    params.trainer &&
+    scheduleSnapshot.trainers.some((trainer) => trainer.id === params.trainer)
+      ? params.trainer
+      : scheduleSnapshot.trainers[0]?.id ?? null;
+
+  const feedbackBanner = resolveFeedbackBanner(params.notice, params.error);
 
   return (
     <main className="portal-shell min-h-screen px-5 py-6 sm:px-8 lg:px-10">
@@ -31,6 +85,17 @@ export default async function SchedulePage() {
         </div>
       </header>
       <div className="mx-auto max-w-7xl space-y-6">
+        {feedbackBanner && (
+          <section
+            className={
+              feedbackBanner.tone === 'success'
+                ? 'rounded-[1.75rem] border border-emerald-200 bg-emerald-50/90 px-5 py-4 text-sm font-medium text-emerald-900 shadow-[0_16px_44px_rgba(22,101,52,0.08)]'
+                : 'rounded-[1.75rem] border border-rose-200 bg-rose-50/90 px-5 py-4 text-sm font-medium text-plum-900 shadow-[0_16px_44px_rgba(127,29,29,0.08)]'
+            }
+          >
+            {feedbackBanner.message}
+          </section>
+        )}
         <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="rounded-[2.5rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-8 shadow-[0_28px_90px_rgba(74,44,74,0.08)] sm:p-10">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-plum-700">
@@ -71,7 +136,12 @@ export default async function SchedulePage() {
           </div>
         </section>
         <div className="-mx-5 sm:mx-0">
-          <KhulaSchedulerShell />
+          <KhulaSchedulerShell
+            trainers={scheduleSnapshot.trainers}
+            availableSlots={scheduleSnapshot.availableSlots}
+            sessions={scheduleSnapshot.sessions}
+            initialTrainerId={selectedTrainerId}
+          />
         </div>
       </div>
     </main>
