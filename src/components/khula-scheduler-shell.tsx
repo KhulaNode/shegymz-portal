@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   KhulaScheduler,
@@ -201,6 +201,21 @@ export function KhulaSchedulerShell({
 
   const returnTo = buildReturnTo(selectedTrainerId);
 
+  function handleSchedulerInteractionCapture(event: ReactMouseEvent<HTMLDivElement>) {
+    const target = event.target as HTMLElement;
+
+    const allowInteractiveControl = Boolean(
+      target.closest('button, [role="tab"], [role="tablist"]'),
+    );
+
+    if (allowInteractiveControl) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
   if (trainers.length === 0) {
     return (
       <section className="rounded-[2.25rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-8 text-center shadow-[0_28px_90px_rgba(74,44,74,0.08)]">
@@ -312,7 +327,10 @@ export function KhulaSchedulerShell({
             </p>
           </div>
 
-          <div className="khula-member-calendar khula-mobile-shell max-sm:[zoom:0.72]">
+          <div
+            className="khula-member-calendar khula-mobile-shell max-sm:[zoom:0.72]"
+            onClickCapture={handleSchedulerInteractionCapture}
+          >
             <SchedulerProvider initialState={scheduleEvents} weekStartsOn="monday">
               <KhulaScheduler
                 views={{ views: ['week', 'day', 'month'], mobileViews: ['week'] }}
@@ -350,6 +368,10 @@ export function KhulaSchedulerShell({
       </div>
 
       <style jsx global>{`
+        .khula-member-calendar .bg-accent.absolute {
+          display: none !important;
+        }
+
         .khula-member-calendar .group.rounded-lg {
           pointer-events: none !important;
         }
