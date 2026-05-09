@@ -283,7 +283,7 @@ ALTER TABLE "TrainingSession"
 ADD CONSTRAINT "TrainingSession_trainer_no_overlap"
 EXCLUDE USING GIST (
   "trainerProfileId" WITH =,
-  tstzrange("startsAt", "endsAt", '[)') WITH &&
+  tsrange("startsAt", "endsAt", '[)') WITH &&
 )
 WHERE ("status" = 'SCHEDULED');
 
@@ -292,6 +292,6 @@ ALTER TABLE "TrainingSession"
 ADD CONSTRAINT "TrainingSession_member_no_overlap"
 EXCLUDE USING GIST (
   "memberUserId" WITH =,
-  tstzrange("startsAt", "endsAt", '[)') WITH &&
+  tsrange("startsAt", "endsAt", '[)') WITH &&
 )
 WHERE ("status" = 'SCHEDULED');
