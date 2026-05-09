@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "db:seed:member-testing": "bash -lc 'set -a; source .env.local; set +a; psql \"$DATABASE_URL\" -f prisma/dev-seeds/milestone4-member-portal-testing.sql'",
+    "verify:member-booking-flow": "bash -lc 'set -a; source .env.local; set +a; node scripts/verify-member-booking-flow.mjs'"
   },
   "dependencies": {
     "@khulanode/khula-scheduler": "^0.1.1",
