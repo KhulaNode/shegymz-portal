@@ -68,6 +68,15 @@ function formatSlotDateTime(startsAtIso: string, endsAtIso: string) {
   };
 }
 
+function formatSlotDateKey(startsAtIso: string) {
+  const startsAt = new Date(startsAtIso);
+  return startsAt.toISOString().slice(0, 10);
+}
+
+function getSessionWindow(startsAtIso: string) {
+  return new Date(startsAtIso).getTime() > Date.now() ? 'upcoming' : 'history';
+}
+
 function buildReturnTo(trainerId: string | null) {
   if (!trainerId) {
     return '/schedule';
@@ -119,6 +128,51 @@ export function KhulaSchedulerShell({
     () =>
       availableSlots.filter((slot) => slot.trainerProfileId === selectedTrainerId),
     [availableSlots, selectedTrainerId],
+  );
+
+  const groupedTrainerSlots = useMemo(() => {
+    const groups = new Map<
+      string,
+      {
+        key: string;
+        dayLabel: string;
+        slots: MemberBookableSlot[];
+      }
+    >();
+
+    for (const slot of selectedTrainerSlots) {
+      const key = formatSlotDateKey(slot.startsAtIso);
+      const existing = groups.get(key);
+
+      if (existing) {
+        existing.slots.push(slot);
+        continue;
+      }
+
+      const { dayLabel } = formatSlotDateTime(slot.startsAtIso, slot.endsAtIso);
+      groups.set(key, {
+        key,
+        dayLabel,
+        slots: [slot],
+      });
+    }
+
+    return Array.from(groups.values());
+  }, [selectedTrainerSlots]);
+
+  const upcomingSessions = useMemo(
+    () => sessions.filter((session) => getSessionWindow(session.startsAtIso) === 'upcoming'),
+    [sessions],
+  );
+
+  const historySessions = useMemo(
+    () =>
+      sessions
+        .filter((session) => getSessionWindow(session.startsAtIso) === 'history')
+        .sort(
+          (a, b) => new Date(b.startsAtIso).getTime() - new Date(a.startsAtIso).getTime(),
+        ),
+    [sessions],
   );
 
   const scheduleEvents = useMemo<Event[]>(() => {
@@ -206,6 +260,48 @@ export function KhulaSchedulerShell({
             {selectedTrainer.bio}
           </p>
         )}
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <div className="rounded-[1.5rem] border border-warmgray-200 bg-white px-5 py-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-plum-700">
+              {portalCopy.schedule.selectedTrainerLabel}
+            </p>
+            <p className="mt-2 text-lg font-semibold text-plum-900">
+              {selectedTrainer?.displayName}
+            </p>
+            <p className="mt-2 text-sm leading-7 text-plum-800">
+              {selectedTrainer?.bio ?? portalCopy.schedule.trainerBioFallback}
+            </p>
+          </div>
+          <div className="rounded-[1.5rem] border border-warmgray-200 bg-white px-5 py-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-plum-700">
+              {portalCopy.schedule.availableSlotsCountLabel}
+            </p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-plum-900">
+              {selectedTrainerSlots.length}
+            </p>
+          </div>
+          <div className="rounded-[1.5rem] border border-warmgray-200 bg-white px-5 py-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-plum-700">
+              {portalCopy.schedule.nextAvailabilityLabel}
+            </p>
+            <p className="mt-2 text-lg font-semibold text-plum-900">
+              {selectedTrainerSlots[0]
+                ? formatSlotDateTime(
+                    selectedTrainerSlots[0].startsAtIso,
+                    selectedTrainerSlots[0].endsAtIso,
+                  ).dayLabel
+                : '—'}
+            </p>
+            <p className="mt-1 text-sm text-plum-800">
+              {selectedTrainerSlots[0]
+                ? formatSlotDateTime(
+                    selectedTrainerSlots[0].startsAtIso,
+                    selectedTrainerSlots[0].endsAtIso,
+                  ).timeLabel
+                : portalCopy.schedule.availableSlotsEmpty}
+            </p>
+          </div>
+        </div>
       </section>
 
       <div className="overflow-hidden rounded-none border-x-0 border-y border-white/75 bg-white/95 p-0 shadow-none backdrop-blur sm:rounded-[2.25rem] sm:border sm:p-5 sm:shadow-[0_26px_90px_rgba(53,18,41,0.09)] lg:rounded-[2.75rem]">
@@ -269,41 +365,61 @@ export function KhulaSchedulerShell({
             {portalCopy.schedule.availableSlotsTitle}
           </h2>
           <div className="mt-5 space-y-4">
-            {selectedTrainerSlots.length === 0 ? (
+            {groupedTrainerSlots.length === 0 ? (
               <p className="rounded-[1.5rem] border border-warmgray-200 bg-white px-5 py-4 text-sm leading-7 text-plum-800">
                 {portalCopy.schedule.availableSlotsEmpty}
               </p>
             ) : (
-              selectedTrainerSlots.map((slot) => {
-                const { dayLabel, timeLabel } = formatSlotDateTime(
-                  slot.startsAtIso,
-                  slot.endsAtIso,
-                );
-
-                return (
-                  <form
-                    key={slot.id}
-                    action={bookTrainingSessionAction}
-                    className="rounded-[1.5rem] border border-warmgray-200 bg-white p-5 shadow-[0_12px_40px_rgba(74,44,74,0.05)]"
-                  >
-                    <input type="hidden" name="availabilitySlotId" value={slot.id} />
-                    <input type="hidden" name="returnTo" value={returnTo} />
-                    <p className="text-xs font-semibold uppercase tracking-[0.26em] text-plum-700">
-                      {slot.trainerDisplayName}
-                    </p>
-                    <p className="mt-3 text-lg font-semibold text-plum-900">{dayLabel}</p>
-                    <p className="mt-1 text-sm text-plum-800">{timeLabel}</p>
-                    <p className="mt-1 text-xs uppercase tracking-[0.22em] text-plum-600">
-                      {slot.timezone}
-                    </p>
-                    <div className="mt-5">
-                      <ScheduleActionButton variant="primary">
-                        {portalCopy.schedule.bookCta}
-                      </ScheduleActionButton>
+              groupedTrainerSlots.map((group) => (
+                <div
+                  key={group.key}
+                  className="rounded-[1.5rem] border border-warmgray-200 bg-white p-5 shadow-[0_12px_40px_rgba(74,44,74,0.05)]"
+                >
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.26em] text-plum-700">
+                        {portalCopy.schedule.bookForDayLabel}
+                      </p>
+                      <p className="mt-2 text-lg font-semibold text-plum-900">{group.dayLabel}</p>
                     </div>
-                  </form>
-                );
-              })
+                    <span className="inline-flex w-fit rounded-full bg-warmgray-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-plum-700">
+                      {group.slots.length} slots
+                    </span>
+                  </div>
+                  <div className="mt-5 grid gap-3">
+                    {group.slots.map((slot) => {
+                      const { timeLabel } = formatSlotDateTime(
+                        slot.startsAtIso,
+                        slot.endsAtIso,
+                      );
+
+                      return (
+                        <form
+                          key={slot.id}
+                          action={bookTrainingSessionAction}
+                          className="rounded-[1.25rem] border border-warmgray-200/90 bg-[#fffaf8] p-4"
+                        >
+                          <input type="hidden" name="availabilitySlotId" value={slot.id} />
+                          <input type="hidden" name="returnTo" value={returnTo} />
+                          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                              <p className="text-base font-semibold text-plum-900">{timeLabel}</p>
+                              <p className="mt-1 text-xs uppercase tracking-[0.22em] text-plum-600">
+                                {slot.timezone}
+                              </p>
+                            </div>
+                            <div className="sm:w-[220px]">
+                              <ScheduleActionButton variant="primary">
+                                {portalCopy.schedule.bookCta}
+                              </ScheduleActionButton>
+                            </div>
+                          </div>
+                        </form>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))
             )}
           </div>
         </div>
@@ -312,67 +428,132 @@ export function KhulaSchedulerShell({
           <h2 className="text-2xl font-semibold text-plum-900">
             {portalCopy.schedule.mySessionsTitle}
           </h2>
-          <div className="mt-5 space-y-4">
-            {sessions.length === 0 ? (
-              <p className="rounded-[1.5rem] border border-warmgray-200 bg-white px-5 py-4 text-sm leading-7 text-plum-800">
-                {portalCopy.schedule.mySessionsEmpty}
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <div className="rounded-[1.5rem] border border-warmgray-200 bg-white px-5 py-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-plum-700">
+                {portalCopy.schedule.sessionSummaryUpcoming}
               </p>
-            ) : (
-              sessions.map((session) => {
-                const { dayLabel, timeLabel } = formatSlotDateTime(
-                  session.startsAtIso,
-                  session.endsAtIso,
-                );
+              <p className="mt-2 text-3xl font-semibold tracking-tight text-plum-900">
+                {upcomingSessions.length}
+              </p>
+            </div>
+            <div className="rounded-[1.5rem] border border-warmgray-200 bg-white px-5 py-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-plum-700">
+                {portalCopy.schedule.sessionSummaryHistory}
+              </p>
+              <p className="mt-2 text-3xl font-semibold tracking-tight text-plum-900">
+                {historySessions.length}
+              </p>
+            </div>
+          </div>
+          <div className="mt-6 space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold text-plum-900">
+                {portalCopy.schedule.upcomingSessionsTitle}
+              </h3>
+              <div className="mt-4 space-y-4">
+                {upcomingSessions.length === 0 ? (
+                  <p className="rounded-[1.5rem] border border-warmgray-200 bg-white px-5 py-4 text-sm leading-7 text-plum-800">
+                    {portalCopy.schedule.upcomingSessionsEmpty}
+                  </p>
+                ) : (
+                  upcomingSessions.map((session) => {
+                    const { dayLabel, timeLabel } = formatSlotDateTime(
+                      session.startsAtIso,
+                      session.endsAtIso,
+                    );
 
-                return (
-                  <div
-                    key={session.id}
-                    className="rounded-[1.5rem] border border-warmgray-200 bg-white p-5 shadow-[0_12px_40px_rgba(74,44,74,0.05)]"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.26em] text-plum-700">
-                          {session.trainerDisplayName}
-                        </p>
-                        <p className="mt-3 text-lg font-semibold text-plum-900">{dayLabel}</p>
-                        <p className="mt-1 text-sm text-plum-800">{timeLabel}</p>
-                      </div>
-                      <span
-                        className={
-                          session.status === 'SCHEDULED'
-                            ? 'rounded-full bg-rose-100 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-plum-900'
-                            : 'rounded-full bg-warmgray-100 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-plum-700'
-                        }
+                    return (
+                      <div
+                        key={session.id}
+                        className="rounded-[1.5rem] border border-warmgray-200 bg-white p-5 shadow-[0_12px_40px_rgba(74,44,74,0.05)]"
                       >
-                        {session.status === 'SCHEDULED'
-                          ? 'Confirmed'
-                          : session.status === 'CANCELLED_BY_MEMBER'
-                            ? 'Cancelled by you'
-                            : 'Cancelled by admin'}
-                      </span>
-                    </div>
-                    {session.memberNotes && (
-                      <p className="mt-4 text-sm leading-7 text-plum-800">{session.memberNotes}</p>
-                    )}
-                    <div className="mt-5">
-                      {session.canCancel ? (
-                        <form action={cancelTrainingSessionAction}>
-                          <input type="hidden" name="trainingSessionId" value={session.id} />
-                          <input type="hidden" name="returnTo" value={returnTo} />
-                          <ScheduleActionButton variant="secondary">
-                            {portalCopy.schedule.cancelCta}
-                          </ScheduleActionButton>
-                        </form>
-                      ) : (
-                        <p className="text-sm leading-7 text-plum-700">
-                          {portalCopy.schedule.cancelLocked}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })
-            )}
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-plum-700">
+                              {session.trainerDisplayName}
+                            </p>
+                            <p className="mt-3 text-lg font-semibold text-plum-900">{dayLabel}</p>
+                            <p className="mt-1 text-sm text-plum-800">{timeLabel}</p>
+                          </div>
+                          <span className="rounded-full bg-rose-100 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-plum-900">
+                            Confirmed
+                          </span>
+                        </div>
+                        {session.memberNotes && (
+                          <p className="mt-4 text-sm leading-7 text-plum-800">
+                            {session.memberNotes}
+                          </p>
+                        )}
+                        <div className="mt-5">
+                          {session.canCancel ? (
+                            <form action={cancelTrainingSessionAction}>
+                              <input type="hidden" name="trainingSessionId" value={session.id} />
+                              <input type="hidden" name="returnTo" value={returnTo} />
+                              <ScheduleActionButton variant="secondary">
+                                {portalCopy.schedule.cancelCta}
+                              </ScheduleActionButton>
+                            </form>
+                          ) : (
+                            <p className="text-sm leading-7 text-plum-700">
+                              {portalCopy.schedule.cancelLocked}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-plum-900">
+                {portalCopy.schedule.pastSessionsTitle}
+              </h3>
+              <div className="mt-4 space-y-4">
+                {historySessions.length === 0 ? (
+                  <p className="rounded-[1.5rem] border border-warmgray-200 bg-white px-5 py-4 text-sm leading-7 text-plum-800">
+                    {portalCopy.schedule.pastSessionsEmpty}
+                  </p>
+                ) : (
+                  historySessions.map((session) => {
+                    const { dayLabel, timeLabel } = formatSlotDateTime(
+                      session.startsAtIso,
+                      session.endsAtIso,
+                    );
+
+                    return (
+                      <div
+                        key={session.id}
+                        className="rounded-[1.5rem] border border-warmgray-200 bg-white p-5 shadow-[0_12px_40px_rgba(74,44,74,0.05)]"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-plum-700">
+                              {session.trainerDisplayName}
+                            </p>
+                            <p className="mt-3 text-lg font-semibold text-plum-900">{dayLabel}</p>
+                            <p className="mt-1 text-sm text-plum-800">{timeLabel}</p>
+                          </div>
+                          <span className="rounded-full bg-warmgray-100 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-plum-700">
+                            {session.status === 'CANCELLED_BY_MEMBER'
+                              ? 'Cancelled by you'
+                              : session.status === 'CANCELLED_BY_ADMIN'
+                                ? 'Cancelled by admin'
+                                : 'Completed'}
+                          </span>
+                        </div>
+                        {session.memberNotes && (
+                          <p className="mt-4 text-sm leading-7 text-plum-800">
+                            {session.memberNotes}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </section>
