@@ -12,7 +12,10 @@ services:
     volumes:
       - portal-postgres-data:/var/lib/postgresql/data
     networks:
-      - shegymz-network
+      shegymz-network:
+        aliases:
+          - shegymz-db
+          - shegymz-portal-postgres
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
