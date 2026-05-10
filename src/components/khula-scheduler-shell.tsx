@@ -91,6 +91,12 @@ function formatCalendarEventWindow(event: Event) {
   })}`;
 }
 
+function calendarEventTone(event: Event) {
+  return event.variant === 'success'
+    ? 'border-emerald-200 bg-emerald-100 text-emerald-950 shadow-[0_6px_14px_rgba(6,95,70,0.12)]'
+    : 'border-sky-200 bg-sky-100 text-sky-950 shadow-[0_6px_14px_rgba(3,105,161,0.12)]';
+}
+
 function buildReturnTo(trainerId: string | null) {
   if (!trainerId) {
     return '/schedule';
@@ -550,6 +556,16 @@ export function KhulaSchedulerShell({
             <p className="mt-2 text-xs leading-5 text-plum-700">
               {portalCopy.schedule.calendarViewerHint}
             </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-100 px-3 py-1 text-[11px] font-semibold text-sky-950">
+                <span className="h-2.5 w-2.5 rounded-full bg-sky-500" />
+                Available slot
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-100 px-3 py-1 text-[11px] font-semibold text-emerald-950">
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                Your booking
+              </span>
+            </div>
           </div>
           <div className="rounded-none border-0 bg-transparent p-0 sm:rounded-[1.5rem] sm:border sm:border-plum-100/70 sm:bg-[#fffdfb] sm:p-3 xl:h-[610px] xl:overflow-auto">
             <div className="flex items-center px-3 pt-3 pb-1 sm:hidden">
@@ -574,7 +590,7 @@ export function KhulaSchedulerShell({
                     CustomEventComponent: (event) => (
                       <button
                         type="button"
-                        className="khula-calendar-event-card flex w-full flex-col rounded-md px-1.5 py-1 text-left text-[10px] leading-tight"
+                        className={`khula-calendar-event-card flex w-full flex-col rounded-md border px-1.5 py-1 text-left text-[10px] leading-tight ${calendarEventTone(event)}`}
                         title={`${event.title} - ${formatCalendarEventWindow(event)}`}
                         onClick={(clickEvent) => {
                           clickEvent.stopPropagation();
