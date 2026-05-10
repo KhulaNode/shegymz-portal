@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   KhulaScheduler,
@@ -201,6 +201,18 @@ export function KhulaSchedulerShell({
 
   const returnTo = buildReturnTo(selectedTrainerId);
 
+  function handleSchedulerInteractionCapture(event: ReactMouseEvent<HTMLDivElement>) {
+    const target = event.target as HTMLElement;
+    const allowedControl = target.closest('button, [role="tab"], [role="tablist"]');
+
+    if (allowedControl) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
   if (trainers.length === 0) {
     return (
       <section className="rounded-[2.25rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-8 text-center shadow-[0_28px_90px_rgba(74,44,74,0.08)]">
@@ -303,61 +315,6 @@ export function KhulaSchedulerShell({
           </div>
         </div>
       </section>
-
-      <div className="overflow-hidden rounded-none border-x-0 border-y border-white/75 bg-white/95 p-0 shadow-none backdrop-blur sm:rounded-[2.25rem] sm:border sm:p-5 sm:shadow-[0_26px_90px_rgba(53,18,41,0.09)] lg:rounded-[2.75rem]">
-        <div className="rounded-none border-0 bg-transparent p-0 sm:rounded-[1.7rem] sm:border sm:border-plum-100/70 sm:bg-[#fffdfb] sm:p-4">
-          <div className="flex items-center px-3 pt-3 pb-1 sm:hidden">
-            <p className="text-sm font-semibold text-plum-900">
-              {formatWeekRange(shownDate)}
-            </p>
-          </div>
-
-          <div className="khula-member-calendar khula-mobile-shell max-sm:[zoom:0.72]">
-            <SchedulerProvider initialState={scheduleEvents} weekStartsOn="monday">
-              <KhulaScheduler
-                views={{ views: ['week', 'day', 'month'], mobileViews: ['week'] }}
-                classNames={{
-                  tabs: { tabList: 'max-sm:!hidden' },
-                  buttons: { addEvent: 'hidden' },
-                }}
-                CustomComponents={{
-                  customButtons: {
-                    CustomPrevButton: (
-                      <button
-                        type="button"
-                        onClick={() => setShownDate((d) => new Date(+d - WEEK_MS))}
-                        className={navBtnClass}
-                      >
-                        ← Prev
-                      </button>
-                    ),
-                    CustomNextButton: (
-                      <button
-                        type="button"
-                        onClick={() => setShownDate((d) => new Date(+d + WEEK_MS))}
-                        className={navBtnClass}
-                      >
-                        Next →
-                      </button>
-                    ),
-                    CustomAddEventButton: <span className="hidden" />,
-                  },
-                }}
-              />
-            </SchedulerProvider>
-          </div>
-        </div>
-      </div>
-
-      <style jsx global>{`
-        .khula-member-calendar .group.rounded-lg {
-          pointer-events: none !important;
-        }
-
-        .khula-member-calendar button.absolute {
-          display: none !important;
-        }
-      `}</style>
 
       <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="rounded-[2.25rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-6 shadow-[0_28px_90px_rgba(74,44,74,0.08)] sm:p-8">
@@ -557,6 +514,81 @@ export function KhulaSchedulerShell({
           </div>
         </div>
       </section>
+
+      <section className="overflow-hidden rounded-[2rem] border border-warmgray-200/80 bg-white/88 p-4 shadow-[0_18px_60px_rgba(74,44,74,0.06)] sm:rounded-[2.25rem] sm:p-5">
+        <div className="mb-4 flex flex-col gap-2 px-1 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-plum-700">
+              {portalCopy.schedule.calendarViewerLabel}
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold text-plum-900">
+              {portalCopy.schedule.calendarViewerTitle}
+            </h2>
+          </div>
+          <p className="max-w-xl text-sm leading-7 text-plum-700">
+            {portalCopy.schedule.calendarViewerHint}
+          </p>
+        </div>
+        <div className="rounded-none border-0 bg-transparent p-0 sm:rounded-[1.7rem] sm:border sm:border-plum-100/70 sm:bg-[#fffdfb] sm:p-4">
+          <div className="flex items-center px-3 pt-3 pb-1 sm:hidden">
+            <p className="text-sm font-semibold text-plum-900">
+              {formatWeekRange(shownDate)}
+            </p>
+          </div>
+
+          <div
+            className="khula-member-calendar khula-mobile-shell max-sm:[zoom:0.72]"
+            onClickCapture={handleSchedulerInteractionCapture}
+          >
+            <SchedulerProvider initialState={scheduleEvents} weekStartsOn="monday">
+              <KhulaScheduler
+                views={{ views: ['week', 'day', 'month'], mobileViews: ['week'] }}
+                classNames={{
+                  tabs: { tabList: 'max-sm:!hidden' },
+                  buttons: { addEvent: 'hidden' },
+                }}
+                CustomComponents={{
+                  customButtons: {
+                    CustomPrevButton: (
+                      <button
+                        type="button"
+                        onClick={() => setShownDate((d) => new Date(+d - WEEK_MS))}
+                        className={navBtnClass}
+                      >
+                        ← Prev
+                      </button>
+                    ),
+                    CustomNextButton: (
+                      <button
+                        type="button"
+                        onClick={() => setShownDate((d) => new Date(+d + WEEK_MS))}
+                        className={navBtnClass}
+                      >
+                        Next →
+                      </button>
+                    ),
+                    CustomAddEventButton: <span className="hidden" />,
+                  },
+                }}
+              />
+            </SchedulerProvider>
+          </div>
+        </div>
+      </section>
+
+      <style jsx global>{`
+        .khula-member-calendar .bg-accent.absolute {
+          display: none !important;
+        }
+
+        .khula-member-calendar .group.rounded-lg {
+          pointer-events: none !important;
+        }
+
+        .khula-member-calendar button.absolute {
+          display: none !important;
+        }
+      `}</style>
     </div>
   );
 }
