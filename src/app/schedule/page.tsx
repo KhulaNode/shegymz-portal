@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { requireProtectedMember } from '@/lib/protected-member';
 import { KhulaSchedulerShell } from '@/components/khula-scheduler-shell';
 import { LogoutButton } from '@/components/logout-button';
+import { ScheduleFeedbackOverlay } from '@/components/schedule-feedback-overlay';
 import { portalCopy } from '@/content/portal-copy';
 import { getMemberScheduleSnapshot } from '@/lib/member-sessions';
 
@@ -84,18 +85,13 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
           <LogoutButton />
         </div>
       </header>
+      {feedbackBanner && (
+        <ScheduleFeedbackOverlay
+          tone={feedbackBanner.tone}
+          message={feedbackBanner.message}
+        />
+      )}
       <div className="mx-auto max-w-[1600px] space-y-5">
-        {feedbackBanner && (
-          <section
-            className={
-              feedbackBanner.tone === 'success'
-                ? 'rounded-[1.75rem] border border-emerald-200 bg-emerald-50/90 px-5 py-4 text-sm font-medium text-emerald-900 shadow-[0_16px_44px_rgba(22,101,52,0.08)]'
-                : 'rounded-[1.75rem] border border-rose-200 bg-rose-50/90 px-5 py-4 text-sm font-medium text-plum-900 shadow-[0_16px_44px_rgba(127,29,29,0.08)]'
-            }
-          >
-            {feedbackBanner.message}
-          </section>
-        )}
         <section className="rounded-[2rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-5 shadow-[0_20px_70px_rgba(74,44,74,0.07)] sm:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
