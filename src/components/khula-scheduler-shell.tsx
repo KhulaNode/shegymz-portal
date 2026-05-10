@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type MouseEvent as ReactMouseEvent } from 'react';
+import { useEffect, useMemo, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   KhulaScheduler,
@@ -118,6 +118,7 @@ export function KhulaSchedulerShell({
   const router = useRouter();
   const [shownDate, setShownDate] = useState(new Date());
   const [selectedTrainerId, setSelectedTrainerId] = useState(initialTrainerId);
+  const [isMobileCalendar, setIsMobileCalendar] = useState(false);
 
   const selectedTrainer = useMemo(
     () => trainers.find((trainer) => trainer.id === selectedTrainerId) ?? null,
@@ -200,6 +201,19 @@ export function KhulaSchedulerShell({
   }, [selectedTrainerSlots, sessions]);
 
   const returnTo = buildReturnTo(selectedTrainerId);
+  const calendarViews = isMobileCalendar
+    ? { views: ['week'], mobileViews: ['week'] }
+    : { views: ['day', 'week', 'month'], mobileViews: ['week'] };
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const updateCalendarMode = () => setIsMobileCalendar(mediaQuery.matches);
+
+    updateCalendarMode();
+    mediaQuery.addEventListener('change', updateCalendarMode);
+
+    return () => mediaQuery.removeEventListener('change', updateCalendarMode);
+  }, []);
 
   function handleSchedulerInteractionCapture(event: ReactMouseEvent<HTMLDivElement>) {
     const target = event.target as HTMLElement;
@@ -309,7 +323,7 @@ export function KhulaSchedulerShell({
         </div>
       </section>
 
-      <section className="grid items-stretch gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(460px,0.9fr)]">
+      <section className="grid items-stretch gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(560px,1.25fr)]">
         <div className="rounded-[2rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-5 shadow-[0_24px_72px_rgba(74,44,74,0.07)] sm:p-6 xl:h-[720px] xl:overflow-hidden">
           <h2 className="text-2xl font-semibold text-plum-900">
             {portalCopy.schedule.availableSlotsTitle}
@@ -532,9 +546,10 @@ export function KhulaSchedulerShell({
             >
               <SchedulerProvider initialState={scheduleEvents} weekStartsOn="monday">
                 <KhulaScheduler
-                  views={{ views: ['week'], mobileViews: ['week'] }}
+                  key={isMobileCalendar ? 'mobile-week-calendar' : 'desktop-full-calendar'}
+                  views={calendarViews}
                   classNames={{
-                    tabs: { tabList: '!hidden' },
+                    tabs: { tabList: isMobileCalendar ? '!hidden' : undefined },
                     buttons: { addEvent: 'hidden' },
                   }}
                   CustomComponents={{
