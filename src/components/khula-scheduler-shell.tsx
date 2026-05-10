@@ -100,7 +100,7 @@ function ScheduleActionButton({
       type="submit"
       className={
         variant === 'primary'
-          ? 'inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-plum-900 via-[#7d2d6c] to-[#b5406a] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(74,44,74,0.22)] transition hover:shadow-[0_12px_32px_rgba(74,44,74,0.3)]'
+          ? 'inline-flex w-full items-center justify-center whitespace-nowrap rounded-full bg-gradient-to-r from-plum-900 via-[#7d2d6c] to-[#b5406a] px-3 py-2 text-xs font-semibold text-white shadow-[0_8px_24px_rgba(74,44,74,0.22)] transition hover:shadow-[0_12px_32px_rgba(74,44,74,0.3)] sm:px-3.5 sm:text-[13px]'
           : 'inline-flex w-full items-center justify-center rounded-full border border-warmgray-300 bg-white px-4 py-2.5 text-sm font-semibold text-plum-900 transition hover:border-rose-300'
       }
     >
@@ -337,20 +337,22 @@ export function KhulaSchedulerShell({
               groupedTrainerSlots.map((group) => (
                 <div
                   key={group.key}
-                  className="rounded-[1.5rem] border border-warmgray-200 bg-white p-5 shadow-[0_12px_40px_rgba(74,44,74,0.05)]"
+                  className="rounded-[1.35rem] border border-warmgray-200 bg-white p-4 shadow-[0_12px_40px_rgba(74,44,74,0.05)]"
                 >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.26em] text-plum-700">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-plum-700">
                         {portalCopy.schedule.bookForDayLabel}
                       </p>
-                      <p className="mt-2 text-lg font-semibold text-plum-900">{group.dayLabel}</p>
+                      <p className="mt-1.5 text-base font-semibold text-plum-900">
+                        {group.dayLabel}
+                      </p>
                     </div>
-                    <span className="inline-flex w-fit rounded-full bg-warmgray-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-plum-700">
+                    <span className="inline-flex w-fit rounded-full bg-warmgray-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-plum-700">
                       {group.slots.length} slots
                     </span>
                   </div>
-                  <div className="mt-5 grid gap-3">
+                  <div className="mt-4 grid gap-2.5">
                     {group.slots.map((slot) => {
                       const { timeLabel } = formatSlotDateTime(
                         slot.startsAtIso,
@@ -361,18 +363,20 @@ export function KhulaSchedulerShell({
                         <form
                           key={slot.id}
                           action={bookTrainingSessionAction}
-                          className="rounded-[1.25rem] border border-warmgray-200/90 bg-[#fffaf8] p-4"
+                          className="rounded-[1.1rem] border border-warmgray-200/90 bg-[#fffaf8] p-3"
                         >
                           <input type="hidden" name="availabilitySlotId" value={slot.id} />
                           <input type="hidden" name="returnTo" value={returnTo} />
-                          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <div>
-                              <p className="text-base font-semibold text-plum-900">{timeLabel}</p>
-                              <p className="mt-1 text-xs uppercase tracking-[0.22em] text-plum-600">
+                          <div className="flex flex-col gap-3 min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between">
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-plum-900 sm:text-[15px]">
+                                {timeLabel}
+                              </p>
+                              <p className="mt-1 truncate text-[10px] uppercase tracking-[0.18em] text-plum-600 sm:text-[11px]">
                                 {slot.timezone}
                               </p>
                             </div>
-                            <div className="sm:w-[220px]">
+                            <div className="min-[430px]:w-[170px] min-[520px]:w-[190px]">
                               <ScheduleActionButton variant="primary">
                                 {portalCopy.schedule.bookCta}
                               </ScheduleActionButton>
