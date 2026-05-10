@@ -579,7 +579,7 @@ export function KhulaSchedulerShell({
               </span>
             </div>
           </div>
-          <div className="rounded-none border-0 bg-transparent p-0 sm:rounded-[1.5rem] sm:border sm:border-plum-100/70 sm:bg-[#fffdfb] sm:p-3 xl:h-[610px] xl:overflow-auto">
+          <div className="rounded-none border-0 bg-transparent p-0 pb-10 sm:rounded-[1.5rem] sm:border sm:border-plum-100/70 sm:bg-[#fffdfb] sm:p-3 sm:pb-12 xl:h-[610px] xl:overflow-auto">
             <div className="flex items-center px-3 pt-3 pb-1 sm:hidden">
               <p className="text-sm font-semibold text-plum-900">
                 {formatWeekRange(shownDate)}
@@ -643,6 +643,7 @@ export function KhulaSchedulerShell({
                 />
               </SchedulerProvider>
             </div>
+            <div className="h-10" aria-hidden="true" />
           </div>
         </div>
       </section>
