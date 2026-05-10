@@ -309,7 +309,7 @@ export function KhulaSchedulerShell({
         </div>
       </section>
 
-      <section className="grid items-stretch gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(320px,0.72fr)]">
+      <section className="grid items-stretch gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(460px,0.9fr)]">
         <div className="rounded-[2rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-5 shadow-[0_24px_72px_rgba(74,44,74,0.07)] sm:p-6 xl:h-[720px] xl:overflow-hidden">
           <h2 className="text-2xl font-semibold text-plum-900">
             {portalCopy.schedule.availableSlotsTitle}
@@ -527,14 +527,14 @@ export function KhulaSchedulerShell({
             </div>
 
             <div
-              className="khula-member-calendar khula-mobile-shell max-sm:[zoom:0.72] xl:[zoom:0.62]"
+              className="khula-member-calendar khula-mobile-shell max-sm:[zoom:0.72] xl:[zoom:0.54] 2xl:[zoom:0.62]"
               onClickCapture={handleSchedulerInteractionCapture}
             >
               <SchedulerProvider initialState={scheduleEvents} weekStartsOn="monday">
                 <KhulaScheduler
-                  views={{ views: ['week', 'day', 'month'], mobileViews: ['week'] }}
+                  views={{ views: ['week'], mobileViews: ['week'] }}
                   classNames={{
-                    tabs: { tabList: 'max-sm:!hidden' },
+                    tabs: { tabList: '!hidden' },
                     buttons: { addEvent: 'hidden' },
                   }}
                   CustomComponents={{
