@@ -103,7 +103,7 @@ export const portalCopy = {
     nextAvailabilityLabel: 'Next open slot',
     calendarViewerLabel: 'Schedule view',
     calendarViewerTitle: 'Calendar overview',
-    calendarViewerHint: 'Use the calendar to view availability and your sessions. Bookings happen from the available-slot cards above.',
+    calendarViewerHint: 'Use the calendar to view availability and your sessions. Bookings happen from the available-slot cards.',
     mySessionsTitle: 'My training sessions',
     mySessionsEmpty: 'You do not have any training sessions yet.',
     upcomingSessionsTitle: 'Upcoming sessions',

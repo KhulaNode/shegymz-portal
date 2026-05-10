@@ -228,100 +228,93 @@ export function KhulaSchedulerShell({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[2.25rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-6 shadow-[0_28px_90px_rgba(74,44,74,0.08)] sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-plum-700">
-          {portalCopy.schedule.trainerPickerLabel}
-        </p>
-        <p className="mt-3 text-sm leading-7 text-plum-800">
-          {portalCopy.schedule.trainerPickerHint}
-        </p>
-        <div className="mt-5 flex flex-wrap gap-3">
-          {trainers.map((trainer) => {
-            const isSelected = trainer.id === selectedTrainerId;
+      <section className="rounded-[1.75rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-5 shadow-[0_18px_60px_rgba(74,44,74,0.06)] sm:p-6">
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-plum-700">
+              {portalCopy.schedule.trainerPickerLabel}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-plum-800">
+              {portalCopy.schedule.trainerPickerHint}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              {trainers.map((trainer) => {
+                const isSelected = trainer.id === selectedTrainerId;
 
-            return (
-              <button
-                key={trainer.id}
-                type="button"
-                onClick={() => {
-                  setSelectedTrainerId(trainer.id);
-                  router.replace(`/schedule?trainer=${encodeURIComponent(trainer.id)}`);
-                }}
-                className={
-                  isSelected
-                    ? 'inline-flex items-center gap-2 rounded-full bg-plum-900 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(74,44,74,0.22)]'
-                    : 'inline-flex items-center gap-2 rounded-full border border-warmgray-300 bg-white px-4 py-2.5 text-sm font-semibold text-plum-900 transition hover:border-rose-300'
-                }
-              >
-                <span>{trainer.displayName}</span>
-                <span
-                  className={
-                    isSelected
-                      ? 'rounded-full bg-white/18 px-2 py-0.5 text-[11px] uppercase tracking-[0.2em]'
-                      : 'rounded-full bg-warmgray-100 px-2 py-0.5 text-[11px] uppercase tracking-[0.2em] text-plum-700'
-                  }
-                >
-                  {trainer.availableSlotCount} slots
-                </span>
-              </button>
-            );
-          })}
-        </div>
-        {selectedTrainer?.bio && (
-          <p className="mt-5 max-w-3xl text-sm leading-7 text-plum-800">
-            {selectedTrainer.bio}
-          </p>
-        )}
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <div className="rounded-[1.5rem] border border-warmgray-200 bg-white px-5 py-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-plum-700">
-              {portalCopy.schedule.selectedTrainerLabel}
-            </p>
-            <p className="mt-2 text-lg font-semibold text-plum-900">
-              {selectedTrainer?.displayName}
-            </p>
-            <p className="mt-2 text-sm leading-7 text-plum-800">
-              {selectedTrainer?.bio ?? portalCopy.schedule.trainerBioFallback}
-            </p>
+                return (
+                  <button
+                    key={trainer.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedTrainerId(trainer.id);
+                      router.replace(`/schedule?trainer=${encodeURIComponent(trainer.id)}`);
+                    }}
+                    className={
+                      isSelected
+                        ? 'inline-flex items-center gap-2 rounded-full bg-plum-900 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(74,44,74,0.22)]'
+                        : 'inline-flex items-center gap-2 rounded-full border border-warmgray-300 bg-white px-4 py-2.5 text-sm font-semibold text-plum-900 transition hover:border-rose-300'
+                    }
+                  >
+                    <span>{trainer.displayName}</span>
+                    <span
+                      className={
+                        isSelected
+                          ? 'rounded-full bg-white/18 px-2 py-0.5 text-[11px] uppercase tracking-[0.2em]'
+                          : 'rounded-full bg-warmgray-100 px-2 py-0.5 text-[11px] uppercase tracking-[0.2em] text-plum-700'
+                      }
+                    >
+                      {trainer.availableSlotCount} slots
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            {selectedTrainer?.bio && (
+              <p className="mt-4 max-w-3xl text-sm leading-6 text-plum-800">
+                {selectedTrainer.bio}
+              </p>
+            )}
           </div>
-          <div className="rounded-[1.5rem] border border-warmgray-200 bg-white px-5 py-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-plum-700">
-              {portalCopy.schedule.availableSlotsCountLabel}
-            </p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight text-plum-900">
-              {selectedTrainerSlots.length}
-            </p>
-          </div>
-          <div className="rounded-[1.5rem] border border-warmgray-200 bg-white px-5 py-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-plum-700">
-              {portalCopy.schedule.nextAvailabilityLabel}
-            </p>
-            <p className="mt-2 text-lg font-semibold text-plum-900">
-              {selectedTrainerSlots[0]
-                ? formatSlotDateTime(
-                    selectedTrainerSlots[0].startsAtIso,
-                    selectedTrainerSlots[0].endsAtIso,
-                  ).dayLabel
-                : '—'}
-            </p>
-            <p className="mt-1 text-sm text-plum-800">
-              {selectedTrainerSlots[0]
-                ? formatSlotDateTime(
-                    selectedTrainerSlots[0].startsAtIso,
-                    selectedTrainerSlots[0].endsAtIso,
-                  ).timeLabel
-                : portalCopy.schedule.availableSlotsEmpty}
-            </p>
+          <div className="grid gap-3 sm:grid-cols-2 xl:w-[430px] xl:shrink-0">
+            <div className="rounded-[1.25rem] border border-warmgray-200 bg-white px-4 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-plum-700">
+                {portalCopy.schedule.availableSlotsCountLabel}
+              </p>
+              <p className="mt-1 text-2xl font-semibold tracking-tight text-plum-900">
+                {selectedTrainerSlots.length}
+              </p>
+            </div>
+            <div className="rounded-[1.25rem] border border-warmgray-200 bg-white px-4 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-plum-700">
+                {portalCopy.schedule.nextAvailabilityLabel}
+              </p>
+              <p className="mt-1 text-sm font-semibold text-plum-900">
+                {selectedTrainerSlots[0]
+                  ? formatSlotDateTime(
+                      selectedTrainerSlots[0].startsAtIso,
+                      selectedTrainerSlots[0].endsAtIso,
+                    ).dayLabel
+                  : '—'}
+              </p>
+              <p className="mt-1 text-xs text-plum-800">
+                {selectedTrainerSlots[0]
+                  ? formatSlotDateTime(
+                      selectedTrainerSlots[0].startsAtIso,
+                      selectedTrainerSlots[0].endsAtIso,
+                    ).timeLabel
+                  : portalCopy.schedule.availableSlotsEmpty}
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="rounded-[2.25rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-6 shadow-[0_28px_90px_rgba(74,44,74,0.08)] sm:p-8">
+      <section className="grid items-stretch gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(320px,0.72fr)]">
+        <div className="rounded-[2rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-5 shadow-[0_24px_72px_rgba(74,44,74,0.07)] sm:p-6 xl:h-[720px] xl:overflow-hidden">
           <h2 className="text-2xl font-semibold text-plum-900">
             {portalCopy.schedule.availableSlotsTitle}
           </h2>
-          <div className="mt-5 space-y-4">
+          <div className="mt-5 space-y-4 xl:max-h-[630px] xl:overflow-y-auto xl:pr-1">
             {groupedTrainerSlots.length === 0 ? (
               <p className="rounded-[1.5rem] border border-warmgray-200 bg-white px-5 py-4 text-sm leading-7 text-plum-800">
                 {portalCopy.schedule.availableSlotsEmpty}
@@ -381,7 +374,7 @@ export function KhulaSchedulerShell({
           </div>
         </div>
 
-        <div className="rounded-[2.25rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-6 shadow-[0_28px_90px_rgba(74,44,74,0.08)] sm:p-8">
+        <div className="rounded-[2rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-5 shadow-[0_24px_72px_rgba(74,44,74,0.07)] sm:p-6 xl:h-[720px] xl:overflow-hidden">
           <h2 className="text-2xl font-semibold text-plum-900">
             {portalCopy.schedule.mySessionsTitle}
           </h2>
@@ -403,7 +396,7 @@ export function KhulaSchedulerShell({
               </p>
             </div>
           </div>
-          <div className="mt-6 space-y-6">
+          <div className="mt-6 space-y-6 xl:max-h-[535px] xl:overflow-y-auto xl:pr-1">
             <div>
               <h3 className="text-lg font-semibold text-plum-900">
                 {portalCopy.schedule.upcomingSessionsTitle}
@@ -513,65 +506,63 @@ export function KhulaSchedulerShell({
             </div>
           </div>
         </div>
-      </section>
 
-      <section className="overflow-hidden rounded-[2rem] border border-warmgray-200/80 bg-white/88 p-4 shadow-[0_18px_60px_rgba(74,44,74,0.06)] sm:rounded-[2.25rem] sm:p-5">
-        <div className="mb-4 flex flex-col gap-2 px-1 sm:flex-row sm:items-end sm:justify-between">
-          <div>
+        <div className="overflow-hidden rounded-[2rem] border border-warmgray-200/80 bg-white/88 p-4 shadow-[0_20px_64px_rgba(74,44,74,0.06)] xl:h-[720px]">
+          <div className="mb-3 px-1">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-plum-700">
               {portalCopy.schedule.calendarViewerLabel}
             </p>
-            <h2 className="mt-2 text-2xl font-semibold text-plum-900">
+            <h2 className="mt-2 text-xl font-semibold text-plum-900">
               {portalCopy.schedule.calendarViewerTitle}
             </h2>
-          </div>
-          <p className="max-w-xl text-sm leading-7 text-plum-700">
-            {portalCopy.schedule.calendarViewerHint}
-          </p>
-        </div>
-        <div className="rounded-none border-0 bg-transparent p-0 sm:rounded-[1.7rem] sm:border sm:border-plum-100/70 sm:bg-[#fffdfb] sm:p-4">
-          <div className="flex items-center px-3 pt-3 pb-1 sm:hidden">
-            <p className="text-sm font-semibold text-plum-900">
-              {formatWeekRange(shownDate)}
+            <p className="mt-2 text-xs leading-5 text-plum-700">
+              {portalCopy.schedule.calendarViewerHint}
             </p>
           </div>
+          <div className="rounded-none border-0 bg-transparent p-0 sm:rounded-[1.5rem] sm:border sm:border-plum-100/70 sm:bg-[#fffdfb] sm:p-3 xl:h-[610px] xl:overflow-hidden">
+            <div className="flex items-center px-3 pt-3 pb-1 sm:hidden">
+              <p className="text-sm font-semibold text-plum-900">
+                {formatWeekRange(shownDate)}
+              </p>
+            </div>
 
-          <div
-            className="khula-member-calendar khula-mobile-shell max-sm:[zoom:0.72]"
-            onClickCapture={handleSchedulerInteractionCapture}
-          >
-            <SchedulerProvider initialState={scheduleEvents} weekStartsOn="monday">
-              <KhulaScheduler
-                views={{ views: ['week', 'day', 'month'], mobileViews: ['week'] }}
-                classNames={{
-                  tabs: { tabList: 'max-sm:!hidden' },
-                  buttons: { addEvent: 'hidden' },
-                }}
-                CustomComponents={{
-                  customButtons: {
-                    CustomPrevButton: (
-                      <button
-                        type="button"
-                        onClick={() => setShownDate((d) => new Date(+d - WEEK_MS))}
-                        className={navBtnClass}
-                      >
-                        ← Prev
-                      </button>
-                    ),
-                    CustomNextButton: (
-                      <button
-                        type="button"
-                        onClick={() => setShownDate((d) => new Date(+d + WEEK_MS))}
-                        className={navBtnClass}
-                      >
-                        Next →
-                      </button>
-                    ),
-                    CustomAddEventButton: <span className="hidden" />,
-                  },
-                }}
-              />
-            </SchedulerProvider>
+            <div
+              className="khula-member-calendar khula-mobile-shell max-sm:[zoom:0.72] xl:[zoom:0.62]"
+              onClickCapture={handleSchedulerInteractionCapture}
+            >
+              <SchedulerProvider initialState={scheduleEvents} weekStartsOn="monday">
+                <KhulaScheduler
+                  views={{ views: ['week', 'day', 'month'], mobileViews: ['week'] }}
+                  classNames={{
+                    tabs: { tabList: 'max-sm:!hidden' },
+                    buttons: { addEvent: 'hidden' },
+                  }}
+                  CustomComponents={{
+                    customButtons: {
+                      CustomPrevButton: (
+                        <button
+                          type="button"
+                          onClick={() => setShownDate((d) => new Date(+d - WEEK_MS))}
+                          className={navBtnClass}
+                        >
+                          ← Prev
+                        </button>
+                      ),
+                      CustomNextButton: (
+                        <button
+                          type="button"
+                          onClick={() => setShownDate((d) => new Date(+d + WEEK_MS))}
+                          className={navBtnClass}
+                        >
+                          Next →
+                        </button>
+                      ),
+                      CustomAddEventButton: <span className="hidden" />,
+                    },
+                  }}
+                />
+              </SchedulerProvider>
+            </div>
           </div>
         </div>
       </section>

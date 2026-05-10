@@ -67,7 +67,7 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
 
       {/* ── Signed-in header ─────────────────────────────── */}
       <header className="mb-5 sm:mb-8">
-        <div className="mx-auto flex max-w-7xl flex-row items-center justify-between gap-3 rounded-[1.5rem] sm:rounded-[2rem] border border-warmgray-200/80 bg-[#fffaf8]/96 px-4 py-3 shadow-[0_18px_60px_rgba(74,44,74,0.08)] sm:px-6 sm:py-4">
+        <div className="mx-auto flex max-w-[1600px] flex-row items-center justify-between gap-3 rounded-[1.5rem] sm:rounded-[2rem] border border-warmgray-200/80 bg-[#fffaf8]/96 px-4 py-3 shadow-[0_18px_60px_rgba(74,44,74,0.08)] sm:px-6 sm:py-4">
           <div className="flex min-w-0 items-center gap-3">
             <Image
               src="/images/logo.png"
@@ -84,7 +84,7 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
           <LogoutButton />
         </div>
       </header>
-      <div className="mx-auto max-w-7xl space-y-6">
+      <div className="mx-auto max-w-[1600px] space-y-5">
         {feedbackBanner && (
           <section
             className={
@@ -96,42 +96,26 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
             {feedbackBanner.message}
           </section>
         )}
-        <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="rounded-[2.5rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-8 shadow-[0_28px_90px_rgba(74,44,74,0.08)] sm:p-10">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-plum-700">
-              {portalCopy.schedule.eyebrow}
-            </p>
-            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-plum-900 sm:text-5xl">
-              {portalCopy.schedule.title}
-            </h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-plum-800 sm:text-lg">
-              {portalCopy.schedule.subtitle}
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <section className="rounded-[2rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-5 shadow-[0_20px_70px_rgba(74,44,74,0.07)] sm:p-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-plum-700">
+                {portalCopy.schedule.eyebrow}
+              </p>
+              <h1 className="mt-2 text-3xl font-semibold tracking-tight text-plum-900 sm:text-4xl">
+                {portalCopy.schedule.title}
+              </h1>
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-plum-800 sm:text-base">
+                {portalCopy.schedule.subtitle}
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
               <Link
                 href="/portal"
                 className="inline-flex justify-center rounded-full border border-warmgray-300 bg-white px-6 py-3 text-sm font-semibold text-plum-900 transition hover:border-rose-300"
               >
                 {portalCopy.schedule.backCta}
               </Link>
-            </div>
-          </div>
-
-          <div className="relative min-h-[320px] overflow-hidden rounded-[2.5rem] shadow-[0_28px_90px_rgba(74,44,74,0.12)]">
-            <Image
-              src="/images/showcase2.jpeg"
-              alt="SheGymZ schedule mood"
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-plum-900/78 via-plum-900/24 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 p-8 text-white">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/68">
-                {portalCopy.schedule.rhythmLabel}
-              </p>
-              <p className="mt-3 max-w-md text-2xl font-semibold leading-tight">
-                {portalCopy.schedule.rhythmTitle}
-              </p>
             </div>
           </div>
         </section>
