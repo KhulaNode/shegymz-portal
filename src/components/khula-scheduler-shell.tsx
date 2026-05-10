@@ -77,6 +77,20 @@ function getSessionWindow(startsAtIso: string) {
   return new Date(startsAtIso).getTime() > Date.now() ? 'upcoming' : 'history';
 }
 
+function formatCalendarEventWindow(event: Event) {
+  return `${event.startDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+  })}, ${event.startDate.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+  })} - ${event.endDate.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+  })}`;
+}
+
 function buildReturnTo(trainerId: string | null) {
   if (!trainerId) {
     return '/schedule';
@@ -119,6 +133,7 @@ export function KhulaSchedulerShell({
   const [shownDate, setShownDate] = useState(new Date());
   const [selectedTrainerId, setSelectedTrainerId] = useState(initialTrainerId);
   const [isMobileCalendar, setIsMobileCalendar] = useState(false);
+  const [selectedCalendarEvent, setSelectedCalendarEvent] = useState<Event | null>(null);
 
   const selectedTrainer = useMemo(
     () => trainers.find((trainer) => trainer.id === selectedTrainerId) ?? null,
@@ -217,7 +232,9 @@ export function KhulaSchedulerShell({
 
   function handleSchedulerInteractionCapture(event: ReactMouseEvent<HTMLDivElement>) {
     const target = event.target as HTMLElement;
-    const allowedControl = target.closest('button, [role="tab"], [role="tablist"]');
+    const allowedControl = target.closest(
+      'button, [role="tab"], [role="tablist"], .khula-calendar-event-card',
+    );
 
     if (allowedControl) {
       return;
@@ -534,7 +551,7 @@ export function KhulaSchedulerShell({
               {portalCopy.schedule.calendarViewerHint}
             </p>
           </div>
-          <div className="rounded-none border-0 bg-transparent p-0 sm:rounded-[1.5rem] sm:border sm:border-plum-100/70 sm:bg-[#fffdfb] sm:p-3 xl:h-[610px] xl:overflow-hidden">
+          <div className="rounded-none border-0 bg-transparent p-0 sm:rounded-[1.5rem] sm:border sm:border-plum-100/70 sm:bg-[#fffdfb] sm:p-3 xl:h-[610px] xl:overflow-auto">
             <div className="flex items-center px-3 pt-3 pb-1 sm:hidden">
               <p className="text-sm font-semibold text-plum-900">
                 {formatWeekRange(shownDate)}
@@ -554,6 +571,25 @@ export function KhulaSchedulerShell({
                     buttons: { addEvent: 'hidden' },
                   }}
                   CustomComponents={{
+                    CustomEventComponent: (event) => (
+                      <button
+                        type="button"
+                        className="khula-calendar-event-card flex w-full flex-col rounded-md px-1.5 py-1 text-left text-[10px] leading-tight"
+                        title={`${event.title} - ${formatCalendarEventWindow(event)}`}
+                        onClick={(clickEvent) => {
+                          clickEvent.stopPropagation();
+                          setSelectedCalendarEvent(event);
+                        }}
+                      >
+                        <span className="truncate font-semibold">{event.title}</span>
+                        <span className="mt-0.5 truncate opacity-80">
+                          {event.startDate.toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                      </button>
+                    ),
                     customButtons: {
                       CustomPrevButton: (
                         <button
@@ -583,13 +619,47 @@ export function KhulaSchedulerShell({
         </div>
       </section>
 
+      {selectedCalendarEvent && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-plum-950/30 px-4 backdrop-blur-sm"
+          onClick={() => setSelectedCalendarEvent(null)}
+        >
+          <div
+            className="w-full max-w-md rounded-[1.75rem] border border-warmgray-200 bg-[#fffaf8] p-6 shadow-[0_28px_90px_rgba(74,44,74,0.24)]"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-plum-700">
+              Training session
+            </p>
+            <h3 className="mt-3 text-2xl font-semibold text-plum-900">
+              {selectedCalendarEvent.title}
+            </h3>
+            <p className="mt-4 text-sm leading-7 text-plum-800">
+              {formatCalendarEventWindow(selectedCalendarEvent)}
+            </p>
+            {selectedCalendarEvent.description && (
+              <p className="mt-3 rounded-[1rem] bg-white px-4 py-3 text-sm leading-6 text-plum-800">
+                {selectedCalendarEvent.description}
+              </p>
+            )}
+            <button
+              type="button"
+              className="mt-6 inline-flex w-full items-center justify-center rounded-full border border-warmgray-300 bg-white px-4 py-2.5 text-sm font-semibold text-plum-900 transition hover:border-rose-300"
+              onClick={() => setSelectedCalendarEvent(null)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
       <style jsx global>{`
         .khula-member-calendar .bg-accent.absolute {
           display: none !important;
         }
 
-        .khula-member-calendar .group.rounded-lg {
-          pointer-events: none !important;
+        .khula-member-calendar .absolute.inset-0 {
+          display: none !important;
         }
 
         .khula-member-calendar button.absolute {
