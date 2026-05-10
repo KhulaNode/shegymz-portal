@@ -77,6 +77,22 @@ function getSessionWindow(startsAtIso: string) {
   return new Date(startsAtIso).getTime() > Date.now() ? 'upcoming' : 'history';
 }
 
+function isUpcomingScheduledSession(session: MemberTrainingSessionSummary) {
+  return session.status === 'SCHEDULED' && getSessionWindow(session.startsAtIso) === 'upcoming';
+}
+
+function getSessionStatusLabel(status: MemberTrainingSessionSummary['status']) {
+  switch (status) {
+    case 'CANCELLED_BY_MEMBER':
+      return 'Cancelled by you';
+    case 'CANCELLED_BY_ADMIN':
+      return 'Cancelled by admin';
+    case 'SCHEDULED':
+    default:
+      return 'Confirmed';
+  }
+}
+
 function formatCalendarEventWindow(event: Event) {
   return `${event.startDate.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -183,14 +199,14 @@ export function KhulaSchedulerShell({
   }, [selectedTrainerSlots]);
 
   const upcomingSessions = useMemo(
-    () => sessions.filter((session) => getSessionWindow(session.startsAtIso) === 'upcoming'),
+    () => sessions.filter(isUpcomingScheduledSession),
     [sessions],
   );
 
   const historySessions = useMemo(
     () =>
       sessions
-        .filter((session) => getSessionWindow(session.startsAtIso) === 'history')
+        .filter((session) => !isUpcomingScheduledSession(session))
         .sort(
           (a, b) => new Date(b.startsAtIso).getTime() - new Date(a.startsAtIso).getTime(),
         ),
@@ -465,7 +481,7 @@ export function KhulaSchedulerShell({
                             <p className="mt-1 text-sm text-plum-800">{timeLabel}</p>
                           </div>
                           <span className="rounded-full bg-rose-100 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-plum-900">
-                            Confirmed
+                            {getSessionStatusLabel(session.status)}
                           </span>
                         </div>
                         {session.memberNotes && (
@@ -524,11 +540,7 @@ export function KhulaSchedulerShell({
                             <p className="mt-1 text-sm text-plum-800">{timeLabel}</p>
                           </div>
                           <span className="rounded-full bg-warmgray-100 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-plum-700">
-                            {session.status === 'CANCELLED_BY_MEMBER'
-                              ? 'Cancelled by you'
-                              : session.status === 'CANCELLED_BY_ADMIN'
-                                ? 'Cancelled by admin'
-                                : 'Completed'}
+                            {getSessionStatusLabel(session.status)}
                           </span>
                         </div>
                         {session.memberNotes && (
