@@ -100,7 +100,7 @@ function ScheduleActionButton({
       type="submit"
       className={
         variant === 'primary'
-          ? 'inline-flex w-full items-center justify-center whitespace-nowrap rounded-full bg-gradient-to-r from-plum-900 via-[#7d2d6c] to-[#b5406a] px-3 py-2 text-xs font-semibold text-white shadow-[0_8px_24px_rgba(74,44,74,0.22)] transition hover:shadow-[0_12px_32px_rgba(74,44,74,0.3)] sm:px-3.5 sm:text-[13px]'
+          ? 'inline-flex w-full items-center justify-center whitespace-nowrap rounded-full bg-gradient-to-r from-plum-900 via-[#7d2d6c] to-[#b5406a] px-3 py-2 text-xs font-semibold text-white shadow-[0_8px_24px_rgba(74,44,74,0.22)] transition hover:shadow-[0_12px_32px_rgba(74,44,74,0.3)]'
           : 'inline-flex w-full items-center justify-center rounded-full border border-warmgray-300 bg-white px-4 py-2.5 text-sm font-semibold text-plum-900 transition hover:border-rose-300'
       }
     >
@@ -367,16 +367,13 @@ export function KhulaSchedulerShell({
                         >
                           <input type="hidden" name="availabilitySlotId" value={slot.id} />
                           <input type="hidden" name="returnTo" value={returnTo} />
-                          <div className="flex flex-col gap-3 min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between">
+                          <div className="flex flex-col gap-3 min-[540px]:flex-row min-[540px]:items-center min-[540px]:justify-between">
                             <div className="min-w-0">
                               <p className="text-sm font-semibold text-plum-900 sm:text-[15px]">
                                 {timeLabel}
                               </p>
-                              <p className="mt-1 truncate text-[10px] uppercase tracking-[0.18em] text-plum-600 sm:text-[11px]">
-                                {slot.timezone}
-                              </p>
                             </div>
-                            <div className="min-[430px]:w-[170px] min-[520px]:w-[190px]">
+                            <div className="min-[540px]:w-[155px]">
                               <ScheduleActionButton variant="primary">
                                 {portalCopy.schedule.bookCta}
                               </ScheduleActionButton>
