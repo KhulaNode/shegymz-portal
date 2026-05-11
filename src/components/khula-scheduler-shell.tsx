@@ -266,21 +266,6 @@ export function KhulaSchedulerShell({
     event.stopPropagation();
   }
 
-  function handleSchedulerInteractionCapture(event: ReactMouseEvent<HTMLDivElement>) {
-    const target = event.target as HTMLElement;
-
-    const allowInteractiveControl = Boolean(
-      target.closest('button, [role="tab"], [role="tablist"]'),
-    );
-
-    if (allowInteractiveControl) {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-  }
-
   if (trainers.length === 0) {
     return (
       <section className="rounded-[2.25rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-8 text-center shadow-[0_28px_90px_rgba(74,44,74,0.08)]">
