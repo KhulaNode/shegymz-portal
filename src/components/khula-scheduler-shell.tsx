@@ -362,8 +362,8 @@ export function KhulaSchedulerShell({
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="rounded-[2.25rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-6 shadow-[0_28px_90px_rgba(74,44,74,0.08)] sm:p-8">
+      <section className="grid items-stretch gap-5 xl:grid-cols-[minmax(280px,0.85fr)_minmax(280px,0.85fr)_minmax(560px,1.35fr)] 2xl:grid-cols-[minmax(300px,0.9fr)_minmax(300px,0.9fr)_minmax(680px,1.45fr)]">
+        <div className="rounded-[2rem] border border-warmgray-200/80 bg-[#fffaf8]/96 p-5 shadow-[0_24px_72px_rgba(74,44,74,0.07)] sm:p-6 xl:h-[720px] xl:overflow-hidden">
           <h2 className="text-2xl font-semibold text-plum-900">
             {portalCopy.schedule.availableSlotsTitle}
           </h2>
