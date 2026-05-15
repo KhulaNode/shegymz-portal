@@ -34,4 +34,4 @@ COPY --from=builder /app/.next/static ./.next/static
 
 EXPOSE 3001
 
-CMD ["sh", "-lc", "npx prisma db push && node server.js"]
+CMD ["sh", "-lc", "npx prisma migrate deploy && node server.js"]
