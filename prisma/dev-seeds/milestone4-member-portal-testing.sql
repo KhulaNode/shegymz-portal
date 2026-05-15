@@ -39,12 +39,15 @@ DO UPDATE SET
   "active" = EXCLUDED."active",
   "updatedAt" = CURRENT_TIMESTAMP;
 
-INSERT INTO "TrainerAvailabilityRule" (
+INSERT INTO "TrainerScheduleBlock" (
   "id",
   "trainerProfileId",
+  "scheduleType",
   "dayOfWeek",
+  "specificDate",
   "startMinutes",
   "endMinutes",
+  "slotDurationMinutes",
   "timezone",
   "effectiveFrom",
   "effectiveUntil",
@@ -54,11 +57,14 @@ INSERT INTO "TrainerAvailabilityRule" (
 )
 VALUES
   (
-    'trainer-rule-m4-naledi-mon',
+    'trainer-block-m4-naledi-mon',
     'trainer-profile-m4-naledi',
+    'RECURRING'::"ScheduleBlockType",
     'MONDAY'::"DayOfWeek",
+    NULL,
     1080,
     1140,
+    60,
     'Africa/Johannesburg',
     CURRENT_DATE - INTERVAL '1 day',
     NULL,
@@ -67,11 +73,14 @@ VALUES
     CURRENT_TIMESTAMP
   ),
   (
-    'trainer-rule-m4-naledi-wed',
+    'trainer-block-m4-naledi-wed',
     'trainer-profile-m4-naledi',
+    'RECURRING'::"ScheduleBlockType",
     'WEDNESDAY'::"DayOfWeek",
+    NULL,
     1080,
     1140,
+    60,
     'Africa/Johannesburg',
     CURRENT_DATE - INTERVAL '1 day',
     NULL,
@@ -80,11 +89,14 @@ VALUES
     CURRENT_TIMESTAMP
   ),
   (
-    'trainer-rule-m4-amahle-tue',
+    'trainer-block-m4-amahle-tue',
     'trainer-profile-m4-amahle',
+    'RECURRING'::"ScheduleBlockType",
     'TUESDAY'::"DayOfWeek",
+    NULL,
     1020,
     1080,
+    60,
     'Africa/Johannesburg',
     CURRENT_DATE - INTERVAL '1 day',
     NULL,
@@ -93,11 +105,14 @@ VALUES
     CURRENT_TIMESTAMP
   ),
   (
-    'trainer-rule-m4-amahle-thu',
+    'trainer-block-m4-amahle-thu',
     'trainer-profile-m4-amahle',
+    'RECURRING'::"ScheduleBlockType",
     'THURSDAY'::"DayOfWeek",
+    NULL,
     1140,
     1200,
+    60,
     'Africa/Johannesburg',
     CURRENT_DATE - INTERVAL '1 day',
     NULL,
@@ -108,9 +123,12 @@ VALUES
 ON CONFLICT ("id")
 DO UPDATE SET
   "trainerProfileId" = EXCLUDED."trainerProfileId",
+  "scheduleType" = EXCLUDED."scheduleType",
   "dayOfWeek" = EXCLUDED."dayOfWeek",
+  "specificDate" = EXCLUDED."specificDate",
   "startMinutes" = EXCLUDED."startMinutes",
   "endMinutes" = EXCLUDED."endMinutes",
+  "slotDurationMinutes" = EXCLUDED."slotDurationMinutes",
   "timezone" = EXCLUDED."timezone",
   "effectiveFrom" = EXCLUDED."effectiveFrom",
   "effectiveUntil" = EXCLUDED."effectiveUntil",
