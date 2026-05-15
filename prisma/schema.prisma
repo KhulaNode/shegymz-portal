@@ -8,21 +8,21 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  passwordHash  String?
-  role          UserRole  @default(CLIENT)
-  membershipStatus           MembershipStatus?
-  membershipCheckedAt        DateTime?
+  id                          String            @id @default(cuid())
+  name                        String?
+  email                       String            @unique
+  emailVerified               DateTime?
+  image                       String?
+  passwordHash                String?
+  role                        UserRole          @default(CLIENT)
+  membershipStatus            MembershipStatus?
+  membershipCheckedAt         DateTime?
   membershipProviderReference String?
-  accounts      Account[]
-  sessions      Session[]
-  trainingSessions TrainingSession[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  accounts                    Account[]
+  sessions                    Session[]
+  trainingSessions            TrainingSession[]
+  createdAt                   DateTime          @default(now())
+  updatedAt                   DateTime          @updatedAt
 }
 
 model Account {
@@ -60,7 +60,7 @@ model VerificationToken {
 }
 
 model SignupChallenge {
-  id                  String                 @id @default(cuid())
+  id                  String           @id @default(cuid())
   email               String
   otpHash             String
   membershipStatus    MembershipStatus
@@ -69,96 +69,100 @@ model SignupChallenge {
   otpSentAt           DateTime?
   expiresAt           DateTime
   consumedAt          DateTime?
-  createdAt           DateTime               @default(now())
+  createdAt           DateTime         @default(now())
 
   @@index([email, createdAt])
   @@index([email, consumedAt, expiresAt])
 }
 
 model TrainerProfile {
-  id               String                     @id @default(cuid())
-  budibaseUserId   String                     @unique
-  displayName      String
-  email            String?
-  bio              String?
-  active           Boolean                    @default(true)
-  availabilityRules TrainerAvailabilityRule[]
+  id                String                    @id @default(cuid())
+  budibaseUserId    String                    @unique
+  displayName       String
+  email             String?
+  bio               String?
+  active            Boolean                   @default(true)
+  scheduleBlocks    TrainerScheduleBlock[]
   availabilitySlots TrainerAvailabilitySlot[]
-  trainingSessions TrainingSession[]
-  createdAt        DateTime                   @default(now())
-  updatedAt        DateTime                   @updatedAt
+  trainingSessions  TrainingSession[]
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
 
   @@index([active])
 }
 
-model TrainerAvailabilityRule {
-  id                String                   @id @default(cuid())
-  trainerProfileId  String
-  trainerProfile    TrainerProfile           @relation(fields: [trainerProfileId], references: [id], onDelete: Cascade)
-  dayOfWeek         DayOfWeek
-  startMinutes      Int
-  endMinutes        Int
-  timezone          String                   @default("Africa/Johannesburg")
-  effectiveFrom     DateTime?
-  effectiveUntil    DateTime?
-  active            Boolean                  @default(true)
-  generatedSlots    TrainerAvailabilitySlot[]
-  createdAt         DateTime                 @default(now())
-  updatedAt         DateTime                 @updatedAt
+model TrainerScheduleBlock {
+  id                  String                    @id @default(cuid())
+  trainerProfileId    String
+  trainerProfile      TrainerProfile            @relation(fields: [trainerProfileId], references: [id], onDelete: Cascade)
+  scheduleType        ScheduleBlockType         @default(RECURRING)
+  dayOfWeek           DayOfWeek?
+  specificDate        DateTime?                 @db.Date
+  startMinutes        Int
+  endMinutes          Int
+  slotDurationMinutes Int                       @default(60)
+  timezone            String                    @default("Africa/Johannesburg")
+  effectiveFrom       DateTime?
+  effectiveUntil      DateTime?
+  active              Boolean                   @default(true)
+  generatedSlots      TrainerAvailabilitySlot[]
+  createdAt           DateTime                  @default(now())
+  updatedAt           DateTime                  @updatedAt
 
   @@index([trainerProfileId, active])
   @@index([dayOfWeek, active])
+  @@index([specificDate, active])
 }
 
 model TrainerAvailabilitySlot {
-  id                String                   @id @default(cuid())
-  trainerProfileId  String
-  trainerProfile    TrainerProfile           @relation(fields: [trainerProfileId], references: [id], onDelete: Cascade)
-  sourceRuleId      String?
-  sourceRule        TrainerAvailabilityRule? @relation(fields: [sourceRuleId], references: [id], onDelete: SetNull)
-  startsAt          DateTime
-  endsAt            DateTime
-  timezone          String                   @default("Africa/Johannesburg")
-  status            AvailabilitySlotStatus   @default(AVAILABLE)
-  trainingSessions  TrainingSession[]
-  createdAt         DateTime                 @default(now())
-  updatedAt         DateTime                 @updatedAt
+  id               String                 @id @default(cuid())
+  trainerProfileId String
+  trainerProfile   TrainerProfile         @relation(fields: [trainerProfileId], references: [id], onDelete: Cascade)
+  sourceBlockId    String?
+  sourceBlock      TrainerScheduleBlock?  @relation(fields: [sourceBlockId], references: [id], onDelete: SetNull)
+  startsAt         DateTime
+  endsAt           DateTime
+  timezone         String                 @default("Africa/Johannesburg")
+  status           AvailabilitySlotStatus @default(AVAILABLE)
+  trainingSessions TrainingSession[]
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
 
-  @@index([trainerProfileId, status, startsAt])
-  @@index([sourceRuleId])
   @@unique([trainerProfileId, startsAt, endsAt])
+  @@index([trainerProfileId, status, startsAt])
+  @@index([sourceBlockId])
 }
 
 model TrainingSession {
-  id                  String                   @id @default(cuid())
-  memberUserId        String
-  memberUser          User                     @relation(fields: [memberUserId], references: [id], onDelete: Restrict)
-  trainerProfileId    String
-  trainerProfile      TrainerProfile           @relation(fields: [trainerProfileId], references: [id], onDelete: Restrict)
-  availabilitySlotId  String
-  availabilitySlot    TrainerAvailabilitySlot  @relation(fields: [availabilitySlotId], references: [id], onDelete: Restrict)
-  startsAt            DateTime
-  endsAt              DateTime
-  status              TrainingSessionStatus    @default(SCHEDULED)
-  memberNotes         String?
-  attendance          SessionAttendance?
-  createdAt           DateTime                 @default(now())
-  updatedAt           DateTime                 @updatedAt
+  id                 String                  @id @default(cuid())
+  memberUserId       String
+  memberUser         User                    @relation(fields: [memberUserId], references: [id], onDelete: Restrict)
+  trainerProfileId   String
+  trainerProfile     TrainerProfile          @relation(fields: [trainerProfileId], references: [id], onDelete: Restrict)
+  availabilitySlotId String
+  availabilitySlot   TrainerAvailabilitySlot @relation(fields: [availabilitySlotId], references: [id], onDelete: Restrict)
+  startsAt           DateTime
+  endsAt             DateTime
+  status             TrainingSessionStatus   @default(SCHEDULED)
+  memberNotes        String?
+  attendance         SessionAttendance?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
 
   @@index([memberUserId, status, startsAt])
   @@index([trainerProfileId, status, startsAt])
 }
 
 model SessionAttendance {
-  id                   String              @id @default(cuid())
-  trainingSessionId    String              @unique
-  trainingSession      TrainingSession     @relation(fields: [trainingSessionId], references: [id], onDelete: Cascade)
-  outcome              AttendanceOutcome
+  id                     String            @id @default(cuid())
+  trainingSessionId      String            @unique
+  trainingSession        TrainingSession   @relation(fields: [trainingSessionId], references: [id], onDelete: Cascade)
+  outcome                AttendanceOutcome
   markedByBudibaseUserId String
-  notes                String?
-  markedAt             DateTime            @default(now())
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
+  notes                  String?
+  markedAt               DateTime          @default(now())
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
 }
 
 enum UserRole {
@@ -178,6 +182,11 @@ enum DayOfWeek {
   FRIDAY
   SATURDAY
   SUNDAY
+}
+
+enum ScheduleBlockType {
+  RECURRING
+  ONE_OFF
 }
 
 enum AvailabilitySlotStatus {
