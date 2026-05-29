@@ -231,6 +231,27 @@ services:
     networks:
       - shegymz-network
 
+  admin-ui:
+    build:
+      context: .
+      dockerfile: admin-ui/Dockerfile
+    container_name: shegymz-admin-ui
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: ${DATABASE_URL_DOCKER:-postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}}
+      NEXTAUTH_URL: ${ADMIN_URL:-http://localhost:3002}
+      NEXTAUTH_SECRET: ${ADMIN_AUTH_SECRET:-${AUTH_SECRET}}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      NODE_ENV: production
+    # ports:
+    #   - "3002:3002"
+    networks:
+      - shegymz-network
+
 volumes:
   minio_data:
   couchdb3_data:
