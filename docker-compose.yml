@@ -240,13 +240,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    env_file:
+      - ./admin-ui/.env
     environment:
       DATABASE_URL: ${DATABASE_URL_DOCKER:-postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}}
-      NEXTAUTH_URL: ${ADMIN_URL:-http://localhost:3002}
-      NEXTAUTH_SECRET: ${ADMIN_AUTH_SECRET:-${AUTH_SECRET}}
-      ADMIN_EMAIL: ${ADMIN_EMAIL}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       NODE_ENV: production
+    volumes:
+      - admin-ui-data:/data
     # ports:
     #   - "3002:3002"
     networks:
@@ -257,6 +257,7 @@ volumes:
   couchdb3_data:
   redis_data:
   portal-postgres-data:
+  admin-ui-data:
 
 networks:
   shegymz-network:

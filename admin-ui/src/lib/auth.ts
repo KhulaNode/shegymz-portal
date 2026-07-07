@@ -1,10 +1,12 @@
 import type { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import bcrypt from 'bcryptjs'
+import { findUserByEmail } from './db'
 
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: 'Admin credentials',
+      name: 'Credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
@@ -12,22 +14,37 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
 
-        const adminEmail = process.env.ADMIN_EMAIL
-        const adminPassword = process.env.ADMIN_PASSWORD
+        const user = findUserByEmail(credentials.email)
+        if (!user) return null
 
-        if (!adminEmail || !adminPassword) return null
+        const valid = await bcrypt.compare(credentials.password, user.password_hash)
+        if (!valid) return null
 
-        if (
-          credentials.email === adminEmail &&
-          credentials.password === adminPassword
-        ) {
-          return { id: 'admin', name: 'Admin', email: adminEmail }
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          trainerId: user.trainer_id,
         }
-
-        return null
       },
     }),
   ],
+  callbacks: {
+    jwt({ token, user }) {
+      if (user) {
+        token.role = user.role
+        token.trainerId = user.trainerId
+      }
+      return token
+    },
+    session({ session, token }) {
+      session.user.id = token.sub!
+      session.user.role = token.role
+      session.user.trainerId = token.trainerId
+      return session
+    },
+  },
   pages: { signIn: '/login' },
   session: { strategy: 'jwt' },
   secret: process.env.NEXTAUTH_SECRET,

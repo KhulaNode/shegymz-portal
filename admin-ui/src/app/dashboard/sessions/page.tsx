@@ -1,4 +1,6 @@
 import { prisma } from '@/lib/prisma'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { cancelSession, markAttendance } from './actions'
 
 function fmt(d: Date) {
@@ -10,15 +12,23 @@ export default async function SessionsPage({
 }: {
   searchParams: Promise<{ tab?: string }>
 }) {
+  const session = await getServerSession(authOptions)
+  const isTrainer = session?.user.role === 'TRAINER'
+  const trainerId = session?.user.trainerId ?? null
+
   const { tab } = await searchParams
   const view = tab === 'past' ? 'past' : 'upcoming'
-
   const now = new Date()
+
+  const trainerFilter = isTrainer && trainerId ? { trainerProfileId: trainerId } : {}
+
   const sessions = await prisma.trainingSession.findMany({
-    where:
-      view === 'upcoming'
+    where: {
+      ...trainerFilter,
+      ...(view === 'upcoming'
         ? { status: 'SCHEDULED', startsAt: { gt: now } }
-        : { startsAt: { lte: now } },
+        : { startsAt: { lte: now } }),
+    },
     orderBy: { startsAt: view === 'upcoming' ? 'asc' : 'desc' },
     take: 100,
     include: {
@@ -30,18 +40,15 @@ export default async function SessionsPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Sessions</h1>
+      <h1 className="text-2xl font-bold">{isTrainer ? 'My Sessions' : 'Sessions'}</h1>
 
-      {/* Tabs */}
       <div className="flex gap-2">
         {(['upcoming', 'past'] as const).map((t) => (
           <a
             key={t}
             href={`/dashboard/sessions${t === 'past' ? '?tab=past' : ''}`}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              view === t
-                ? 'bg-pink-600 text-white'
-                : 'bg-zinc-800 text-zinc-400 hover:text-white'
+              view === t ? 'bg-pink-600 text-white' : 'bg-zinc-800 text-zinc-400 hover:text-white'
             }`}
           >
             {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -90,10 +97,7 @@ export default async function SessionsPage({
                 <td className="px-4 py-3 flex gap-3 items-center">
                   {s.status === 'SCHEDULED' && s.startsAt > now && (
                     <form action={cancelSession.bind(null, s.id)}>
-                      <button type="submit" className="text-xs text-red-400 hover:text-red-300 underline"
-                        onClick={(e) => { if (!confirm('Cancel this session?')) e.preventDefault() }}>
-                        Cancel
-                      </button>
+                      <button type="submit" className="text-xs text-red-400 hover:text-red-300 underline">Cancel</button>
                     </form>
                   )}
                   {s.status === 'SCHEDULED' && s.startsAt <= now && !s.attendance && (
@@ -104,9 +108,7 @@ export default async function SessionsPage({
                         <option value="MISSED">Missed</option>
                         <option value="CANCELLED">Cancelled</option>
                       </select>
-                      <button type="submit" className="text-xs bg-pink-600 hover:bg-pink-500 px-2 py-1 rounded">
-                        Save
-                      </button>
+                      <button type="submit" className="text-xs bg-pink-600 hover:bg-pink-500 px-2 py-1 rounded">Save</button>
                     </form>
                   )}
                 </td>

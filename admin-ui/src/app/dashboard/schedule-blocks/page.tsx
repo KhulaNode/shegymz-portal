@@ -1,4 +1,6 @@
 import { prisma } from '@/lib/prisma'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { createScheduleBlock, deleteScheduleBlock, toggleBlockActive } from './actions'
 
 function minsToTime(m: number) {
@@ -6,9 +8,14 @@ function minsToTime(m: number) {
 }
 
 export default async function ScheduleBlocksPage() {
+  const session = await getServerSession(authOptions)
+  const isTrainer = session?.user.role === 'TRAINER'
+  const trainerId = session?.user.trainerId ?? null
+
   const [trainers, blocks] = await Promise.all([
     prisma.trainerProfile.findMany({ where: { active: true }, orderBy: { displayName: 'asc' } }),
     prisma.trainerScheduleBlock.findMany({
+      where: isTrainer && trainerId ? { trainerProfileId: trainerId } : undefined,
       orderBy: { createdAt: 'desc' },
       include: {
         trainerProfile: { select: { displayName: true } },
@@ -22,19 +29,23 @@ export default async function ScheduleBlocksPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Schedule Blocks</h1>
+      <h1 className="text-2xl font-bold">{isTrainer ? 'My Schedule' : 'Schedule Blocks'}</h1>
 
       {/* Create form */}
       <form action={createScheduleBlock} className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-4">
         <h2 className="font-semibold text-zinc-200">Add schedule block</h2>
         <div className="grid grid-cols-3 gap-3">
-          <div className="col-span-1">
-            <label className="label">Trainer *</label>
-            <select name="trainerProfileId" required className="input-field w-full">
-              <option value="">Select trainer</option>
-              {trainers.map(t => <option key={t.id} value={t.id}>{t.displayName}</option>)}
-            </select>
-          </div>
+          {isTrainer ? (
+            <input type="hidden" name="trainerProfileId" value={trainerId ?? ''} />
+          ) : (
+            <div className="col-span-1">
+              <label className="label">Trainer *</label>
+              <select name="trainerProfileId" required className="input-field w-full">
+                <option value="">Select trainer</option>
+                {trainers.map(t => <option key={t.id} value={t.id}>{t.displayName}</option>)}
+              </select>
+            </div>
+          )}
           <div>
             <label className="label">Type *</label>
             <select name="scheduleType" required className="input-field w-full">
@@ -72,8 +83,7 @@ export default async function ScheduleBlocksPage() {
             </select>
           </div>
         </div>
-        <button type="submit"
-          className="px-4 py-2 bg-pink-600 hover:bg-pink-500 rounded-lg text-sm font-medium transition-colors">
+        <button type="submit" className="px-4 py-2 bg-pink-600 hover:bg-pink-500 rounded-lg text-sm font-medium transition-colors">
           Create block
         </button>
       </form>
@@ -92,27 +102,19 @@ export default async function ScheduleBlocksPage() {
             {blocks.map((b) => (
               <tr key={b.id} className="hover:bg-zinc-800/50">
                 <td className="px-4 py-3 text-white">{b.trainerProfile.displayName}</td>
-                <td className="px-4 py-3 text-zinc-400">
-                  <span className={`px-2 py-0.5 rounded text-xs ${
-                    b.scheduleType === 'RECURRING' ? 'bg-blue-900 text-blue-300' : 'bg-purple-900 text-purple-300'
-                  }`}>
+                <td className="px-4 py-3">
+                  <span className={`px-2 py-0.5 rounded text-xs ${b.scheduleType === 'RECURRING' ? 'bg-blue-900 text-blue-300' : 'bg-purple-900 text-purple-300'}`}>
                     {b.scheduleType === 'RECURRING' ? 'Recurring' : 'One-off'}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-zinc-300">
-                  {b.scheduleType === 'RECURRING'
-                    ? b.dayOfWeek
-                    : b.specificDate?.toISOString().split('T')[0] ?? '—'}
+                  {b.scheduleType === 'RECURRING' ? b.dayOfWeek : b.specificDate?.toISOString().split('T')[0] ?? '—'}
                 </td>
-                <td className="px-4 py-3 text-zinc-300">
-                  {minsToTime(b.startMinutes)} – {minsToTime(b.endMinutes)}
-                </td>
+                <td className="px-4 py-3 text-zinc-300">{minsToTime(b.startMinutes)} – {minsToTime(b.endMinutes)}</td>
                 <td className="px-4 py-3 text-zinc-400">{b.slotDurationMinutes}m</td>
                 <td className="px-4 py-3 text-zinc-400">{b._count.generatedSlots}</td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-0.5 rounded-full text-xs ${
-                    b.active ? 'bg-green-900 text-green-300' : 'bg-zinc-700 text-zinc-400'
-                  }`}>
+                  <span className={`px-2 py-0.5 rounded-full text-xs ${b.active ? 'bg-green-900 text-green-300' : 'bg-zinc-700 text-zinc-400'}`}>
                     {b.active ? 'Yes' : 'No'}
                   </span>
                 </td>
@@ -123,10 +125,7 @@ export default async function ScheduleBlocksPage() {
                     </button>
                   </form>
                   <form action={deleteScheduleBlock.bind(null, b.id)}>
-                    <button type="submit" className="text-xs text-red-400 hover:text-red-300 underline"
-                      onClick={(e) => { if (!confirm('Delete this block and its future slots?')) e.preventDefault() }}>
-                      Delete
-                    </button>
+                    <button type="submit" className="text-xs text-red-400 hover:text-red-300 underline">Delete</button>
                   </form>
                 </td>
               </tr>
