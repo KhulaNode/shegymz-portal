@@ -32,8 +32,8 @@ export default async function ScheduleBlocksPage() {
       <h1 className="text-2xl font-bold">{isTrainer ? 'My Schedule' : 'Schedule Blocks'}</h1>
 
       {/* Create form */}
-      <form action={createScheduleBlock} className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-4">
-        <h2 className="font-semibold text-zinc-200">Add schedule block</h2>
+      <form action={createScheduleBlock} className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-none">
+        <h2 className="font-semibold text-zinc-800 dark:text-zinc-200">Add schedule block</h2>
         <div className="grid grid-cols-3 gap-3">
           {isTrainer ? (
             <input type="hidden" name="trainerProfileId" value={trainerId ?? ''} />
@@ -83,49 +83,49 @@ export default async function ScheduleBlocksPage() {
             </select>
           </div>
         </div>
-        <button type="submit" className="px-4 py-2 bg-pink-600 hover:bg-pink-500 rounded-lg text-sm font-medium transition-colors">
+        <button type="submit" className="rounded-lg bg-pink-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-pink-500">
           Create block
         </button>
       </form>
 
       {/* Table */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-none">
         <table className="w-full text-sm">
-          <thead className="bg-zinc-800 text-zinc-400">
+          <thead className="bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
             <tr>
               {['Trainer', 'Type', 'Day / Date', 'Time range', 'Duration', 'Slots', 'Active', ''].map(h => (
                 <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-800">
+          <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
             {blocks.map((b) => (
-              <tr key={b.id} className="hover:bg-zinc-800/50">
-                <td className="px-4 py-3 text-white">{b.trainerProfile.displayName}</td>
+              <tr key={b.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                <td className="px-4 py-3 text-zinc-900 dark:text-white">{b.trainerProfile.displayName}</td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-0.5 rounded text-xs ${b.scheduleType === 'RECURRING' ? 'bg-blue-900 text-blue-300' : 'bg-purple-900 text-purple-300'}`}>
+                  <span className={`rounded px-2 py-0.5 text-xs ${b.scheduleType === 'RECURRING' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' : 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300'}`}>
                     {b.scheduleType === 'RECURRING' ? 'Recurring' : 'One-off'}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-zinc-300">
+                <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">
                   {b.scheduleType === 'RECURRING' ? b.dayOfWeek : b.specificDate?.toISOString().split('T')[0] ?? '—'}
                 </td>
-                <td className="px-4 py-3 text-zinc-300">{minsToTime(b.startMinutes)} – {minsToTime(b.endMinutes)}</td>
-                <td className="px-4 py-3 text-zinc-400">{b.slotDurationMinutes}m</td>
-                <td className="px-4 py-3 text-zinc-400">{b._count.generatedSlots}</td>
+                <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{minsToTime(b.startMinutes)} – {minsToTime(b.endMinutes)}</td>
+                <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">{b.slotDurationMinutes}m</td>
+                <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">{b._count.generatedSlots}</td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-0.5 rounded-full text-xs ${b.active ? 'bg-green-900 text-green-300' : 'bg-zinc-700 text-zinc-400'}`}>
+                  <span className={`rounded-full px-2 py-0.5 text-xs ${b.active ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400'}`}>
                     {b.active ? 'Yes' : 'No'}
                   </span>
                 </td>
                 <td className="px-4 py-3 flex gap-3">
                   <form action={toggleBlockActive.bind(null, b.id, !b.active)}>
-                    <button type="submit" className="text-xs text-zinc-400 hover:text-white underline">
+                    <button type="submit" className="text-xs text-zinc-600 underline hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white">
                       {b.active ? 'Disable' : 'Enable'}
                     </button>
                   </form>
                   <form action={deleteScheduleBlock.bind(null, b.id)}>
-                    <button type="submit" className="text-xs text-red-400 hover:text-red-300 underline">Delete</button>
+                    <button type="submit" className="text-xs text-red-600 underline hover:text-red-500 dark:text-red-400 dark:hover:text-red-300">Delete</button>
                   </form>
                 </td>
               </tr>

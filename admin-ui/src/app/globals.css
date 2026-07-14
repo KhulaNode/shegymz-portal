@@ -4,9 +4,9 @@
 
 @layer components {
   .input-field {
-    @apply px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500;
+    @apply rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-pink-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-500;
   }
   .label {
-    @apply block text-xs text-zinc-400 mb-1;
+    @apply mb-1 block text-xs text-zinc-600 dark:text-zinc-400;
   }
 }

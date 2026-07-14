@@ -19,8 +19,8 @@ export default async function UsersPage() {
       <h1 className="text-2xl font-bold">Users</h1>
 
       {/* Create user form */}
-      <form action={createUserAction} className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-4">
-        <h2 className="font-semibold text-zinc-200">Add user</h2>
+      <form action={createUserAction} className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-none">
+        <h2 className="font-semibold text-zinc-800 dark:text-zinc-200">Add user</h2>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="label">Name</label>
@@ -51,29 +51,29 @@ export default async function UsersPage() {
             </select>
           </div>
         </div>
-        <button type="submit" className="px-4 py-2 bg-pink-600 hover:bg-pink-500 rounded-lg text-sm font-medium transition-colors">
+        <button type="submit" className="rounded-lg bg-pink-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-pink-500">
           Create user
         </button>
       </form>
 
       {/* User list */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-none">
         <table className="w-full text-sm">
-          <thead className="bg-zinc-800 text-zinc-400">
+          <thead className="bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
             <tr>
               {['Name', 'Email', 'Role', 'Trainer ID', 'Created', 'Reset Password', ''].map((h) => (
                 <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-800">
+          <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
             {users.map((u) => (
-              <tr key={u.id} className="hover:bg-zinc-800/50">
-                <td className="px-4 py-3 text-white">{u.name}</td>
-                <td className="px-4 py-3 text-zinc-400">{u.email}</td>
+              <tr key={u.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                <td className="px-4 py-3 text-zinc-900 dark:text-white">{u.name}</td>
+                <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">{u.email}</td>
                 <td className="px-4 py-3">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    u.role === 'ADMIN' ? 'bg-pink-900 text-pink-300' : 'bg-zinc-700 text-zinc-300'
+                    u.role === 'ADMIN' ? 'bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300' : 'bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300'
                   }`}>
                     {u.role}
                   </span>
@@ -84,14 +84,14 @@ export default async function UsersPage() {
                   <form action={resetPasswordAction} className="flex gap-2 items-center">
                     <input type="hidden" name="id" value={u.id} />
                     <input name="password" type="password" minLength={8} placeholder="New password" className="input-field w-32 text-xs" />
-                    <button type="submit" className="text-xs text-zinc-400 hover:text-white px-2 py-1 rounded border border-zinc-700 hover:border-zinc-500">
+                    <button type="submit" className="rounded border border-zinc-300 px-2 py-1 text-xs text-zinc-600 hover:border-zinc-500 hover:text-zinc-950 dark:border-zinc-700 dark:text-zinc-400 dark:hover:text-white">
                       Reset
                     </button>
                   </form>
                 </td>
                 <td className="px-4 py-3">
                   <form action={deleteUserAction.bind(null, u.id)}>
-                    <button type="submit" className="text-xs text-red-400 hover:text-red-300">
+                    <button type="submit" className="text-xs text-red-600 hover:text-red-500 dark:text-red-400 dark:hover:text-red-300">
                       Delete
                     </button>
                   </form>
