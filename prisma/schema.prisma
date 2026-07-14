@@ -18,6 +18,8 @@ model User {
   membershipStatus            MembershipStatus?
   membershipCheckedAt         DateTime?
   membershipProviderReference String?
+  trainerProfile              TrainerProfile?   @relation("UserTrainer", fields: [trainerId], references: [id])
+  trainerId                   String?           @unique
   accounts                    Account[]
   sessions                    Session[]
   trainingSessions            TrainingSession[]
@@ -77,11 +79,12 @@ model SignupChallenge {
 
 model TrainerProfile {
   id                String                    @id @default(cuid())
-  budibaseUserId    String                    @unique
+  budibaseUserId    String?                   @unique
   displayName       String
   email             String?
   bio               String?
   active            Boolean                   @default(true)
+  user              User?                     @relation("UserTrainer")
   scheduleBlocks    TrainerScheduleBlock[]
   availabilitySlots TrainerAvailabilitySlot[]
   trainingSessions  TrainingSession[]
@@ -158,7 +161,7 @@ model SessionAttendance {
   trainingSessionId      String            @unique
   trainingSession        TrainingSession   @relation(fields: [trainingSessionId], references: [id], onDelete: Cascade)
   outcome                AttendanceOutcome
-  markedByBudibaseUserId String
+  markedByIdentifier     String
   notes                  String?
   markedAt               DateTime          @default(now())
   createdAt              DateTime          @default(now())
@@ -167,6 +170,8 @@ model SessionAttendance {
 
 enum UserRole {
   CLIENT
+  ADMIN
+  TRAINER
 }
 
 enum MembershipStatus {

@@ -49,8 +49,12 @@ export const requireProtectedMember = cache(async (): Promise<ProtectedMember> =
     redirect('/login?error=account-missing');
   }
 
+  if (user.role !== 'CLIENT') {
+    redirect('/login?error=not-a-member');
+  }
+
   if (user.membershipStatus === 'ACTIVE' && membershipCacheIsFresh(user.membershipCheckedAt)) {
-    return user;
+    return user as ProtectedMember;
   }
 
   const membership = await lookupActiveMembershipByEmail(email);
@@ -78,7 +82,7 @@ export const requireProtectedMember = cache(async (): Promise<ProtectedMember> =
     redirect('/membership-required');
   }
 
-  return updatedUser;
+  return updatedUser as ProtectedMember;
 });
 
 export const protectedMemberConfig = {

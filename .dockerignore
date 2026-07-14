@@ -1,5 +1,9 @@
 node_modules
-.next
 .git
-npm-debug.log
-.env.local
+.cache
+.next
+.env*
+*.md
+*.log
+admin-ui/.next
+admin-ui/node_modules
