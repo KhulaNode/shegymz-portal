@@ -14,10 +14,10 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
 
-        const user = findUserByEmail(credentials.email)
+        const user = await findUserByEmail(credentials.email)
         if (!user) return null
 
-        const valid = await bcrypt.compare(credentials.password, user.password_hash)
+        const valid = await bcrypt.compare(credentials.password, user.passwordHash)
         if (!valid) return null
 
         return {
@@ -25,7 +25,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
-          trainerId: user.trainer_id,
+          trainerId: user.trainerId,
         }
       },
     }),
@@ -40,8 +40,8 @@ export const authOptions: NextAuthOptions = {
     },
     session({ session, token }) {
       session.user.id = token.sub!
-      session.user.role = token.role
-      session.user.trainerId = token.trainerId
+      session.user.role = token.role as 'ADMIN' | 'TRAINER'
+      session.user.trainerId = token.trainerId as string | null
       return session
     },
   },

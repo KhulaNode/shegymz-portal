@@ -7,14 +7,12 @@ export async function createTrainer(formData: FormData) {
   const displayName = formData.get('displayName') as string
   const email = formData.get('email') as string
   const bio = formData.get('bio') as string
-  const budibaseUserId = formData.get('budibaseUserId') as string
 
   await prisma.trainerProfile.create({
     data: {
       displayName,
       email: email || null,
       bio: bio || null,
-      budibaseUserId,
       active: true,
     },
   })

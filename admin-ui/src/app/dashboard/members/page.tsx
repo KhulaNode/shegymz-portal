@@ -4,7 +4,16 @@ export default async function MembersPage() {
   const members = await prisma.user.findMany({
     orderBy: { createdAt: 'desc' },
     take: 200,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      membershipStatus: true,
+      createdAt: true,
+    },
   })
+
+  type MemberRow = (typeof members)[number]
 
   return (
     <div className="space-y-6">
@@ -20,7 +29,7 @@ export default async function MembersPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-800">
-            {members.map((m) => (
+            {members.map((m: MemberRow) => (
               <tr key={m.id} className="hover:bg-zinc-800/50">
                 <td className="px-4 py-3 text-white">{m.name ?? '—'}</td>
                 <td className="px-4 py-3 text-zinc-400">{m.email}</td>

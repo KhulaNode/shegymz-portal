@@ -78,8 +78,8 @@ export default async function UsersPage() {
                     {u.role}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-zinc-500 font-mono text-xs">{u.trainer_id ?? '—'}</td>
-                <td className="px-4 py-3 text-zinc-500 text-xs">{u.created_at.split(' ')[0]}</td>
+                <td className="px-4 py-3 text-zinc-500 font-mono text-xs">{u.trainerId ?? '—'}</td>
+                <td className="px-4 py-3 text-zinc-500 text-xs">{u.createdAt.toISOString().split('T')[0]}</td>
                 <td className="px-4 py-3">
                   <form action={resetPasswordAction} className="flex gap-2 items-center">
                     <input type="hidden" name="id" value={u.id} />

@@ -1,82 +1,81 @@
-import Database from 'better-sqlite3'
+import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
-import fs from 'fs'
-import path from 'path'
 
-const DB_PATH = process.env.ADMIN_DB_PATH ?? path.join(process.cwd(), 'data', 'admin.db')
-
-let _db: Database.Database | null = null
-
-export function getDb(): Database.Database {
-  if (!_db) {
-    fs.mkdirSync(path.dirname(DB_PATH), { recursive: true })
-    _db = new Database(DB_PATH)
-    _db.pragma('journal_mode = WAL')
-    _db.exec(`
-      CREATE TABLE IF NOT EXISTS users (
-        id          TEXT PRIMARY KEY,
-        email       TEXT UNIQUE NOT NULL,
-        password_hash TEXT NOT NULL,
-        name        TEXT NOT NULL,
-        role        TEXT NOT NULL CHECK(role IN ('ADMIN','TRAINER')),
-        trainer_id  TEXT,
-        created_at  TEXT NOT NULL DEFAULT (datetime('now'))
-      )
-    `)
-
-    // Seed initial admin from env vars if table is empty
-    const row = _db.prepare('SELECT COUNT(*) as c FROM users').get() as { c: number }
-    if (row.c === 0) {
-      const email = process.env.ADMIN_EMAIL
-      const password = process.env.ADMIN_PASSWORD
-      if (email && password) {
-        _db.prepare(
-          'INSERT INTO users (id, email, password_hash, name, role) VALUES (?, ?, ?, ?, ?)'
-        ).run(crypto.randomUUID(), email, bcrypt.hashSync(password, 12), 'Admin', 'ADMIN')
-      }
-    }
-  }
-  return _db
-}
-
-export interface DbUser {
+export interface AdminUser {
   id: string
   email: string
-  password_hash: string
-  name: string
+  passwordHash: string
+  name: string | null
   role: 'ADMIN' | 'TRAINER'
-  trainer_id: string | null
-  created_at: string
+  trainerId: string | null
+  createdAt: Date
 }
 
-export function findUserByEmail(email: string): DbUser | null {
-  return getDb().prepare('SELECT * FROM users WHERE email = ?').get(email) as DbUser | null
+export function findUserByEmail(email: string): Promise<AdminUser | null> {
+  return prisma.user.findFirst({
+    where: {
+      email,
+      role: { in: ['ADMIN', 'TRAINER'] },
+      passwordHash: { not: null },
+    },
+    select: {
+      id: true,
+      email: true,
+      passwordHash: true,
+      name: true,
+      role: true,
+      trainerId: true,
+      createdAt: true,
+    },
+  }) as Promise<AdminUser | null>
 }
 
-export function getAllUsers(): Omit<DbUser, 'password_hash'>[] {
-  return getDb()
-    .prepare('SELECT id, email, name, role, trainer_id, created_at FROM users ORDER BY role, name')
-    .all() as Omit<DbUser, 'password_hash'>[]
+export async function getAllUsers(): Promise<Omit<AdminUser, 'passwordHash'>[]> {
+  const users = await prisma.user.findMany({
+    where: { role: { in: ['ADMIN', 'TRAINER'] } },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      trainerId: true,
+      createdAt: true,
+    },
+    orderBy: [{ role: 'asc' }, { name: 'asc' }],
+  })
+  return users.map((u) => ({
+    ...u,
+    createdAt: u.createdAt,
+  })) as Omit<AdminUser, 'passwordHash'>[]
 }
 
-export function createUser(
+export async function createUser(
   email: string,
   password: string,
   name: string,
   role: 'ADMIN' | 'TRAINER',
   trainerId?: string | null
 ) {
-  getDb()
-    .prepare('INSERT INTO users (id, email, password_hash, name, role, trainer_id) VALUES (?, ?, ?, ?, ?, ?)')
-    .run(crypto.randomUUID(), email, bcrypt.hashSync(password, 12), name, role, trainerId ?? null)
+  const passwordHash = await bcrypt.hash(password, 12)
+  await prisma.user.create({
+    data: {
+      email,
+      passwordHash,
+      name,
+      role,
+      trainerId: trainerId ?? null,
+    },
+  })
 }
 
-export function deleteUser(id: string) {
-  getDb().prepare('DELETE FROM users WHERE id = ?').run(id)
+export async function deleteUser(id: string) {
+  await prisma.user.delete({ where: { id } })
 }
 
-export function updatePassword(id: string, newPassword: string) {
-  getDb()
-    .prepare('UPDATE users SET password_hash = ? WHERE id = ?')
-    .run(bcrypt.hashSync(newPassword, 12), id)
+export async function updatePassword(id: string, newPassword: string) {
+  const passwordHash = await bcrypt.hash(newPassword, 12)
+  await prisma.user.update({
+    where: { id },
+    data: { passwordHash },
+  })
 }

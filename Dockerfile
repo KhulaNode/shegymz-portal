@@ -2,9 +2,11 @@ FROM node:20-alpine AS deps
 WORKDIR /app
 
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV npm_config_audit=false
+ENV npm_config_fund=false
 
 COPY package.json package-lock.json* ./
-RUN npm ci --legacy-peer-deps
+RUN npm ci --legacy-peer-deps --no-audit --no-fund --ignore-scripts
 
 FROM node:20-alpine AS builder
 WORKDIR /app

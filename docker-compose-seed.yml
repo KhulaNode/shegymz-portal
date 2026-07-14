@@ -1,0 +1,18 @@
+services:
+  seed:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shegymz-portal-seed
+    restart: no
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: ${DATABASE_URL_DOCKER:-postgresql://${POSTGRES_USER}:***@postgres:5432/${POSTGRES_DB}}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_NAME: ${ADMIN_NAME:-Admin}
+    entrypoint: ["npx", "prisma", "db", "seed"]
+    networks:
+      - shegymz-network

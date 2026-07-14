@@ -13,12 +13,12 @@ export async function createUserAction(formData: FormData) {
   if (!email || !password || !name || !role) return
   if (role === 'TRAINER' && !trainerId) return
 
-  createUser(email, password, name, role, trainerId)
+  await createUser(email, password, name, role, trainerId)
   revalidatePath('/dashboard/users')
 }
 
 export async function deleteUserAction(id: string) {
-  deleteUser(id)
+  await deleteUser(id)
   revalidatePath('/dashboard/users')
 }
 
@@ -26,6 +26,6 @@ export async function resetPasswordAction(formData: FormData) {
   const id = formData.get('id') as string
   const password = formData.get('password') as string
   if (!id || !password || password.length < 8) return
-  updatePassword(id, password)
+  await updatePassword(id, password)
   revalidatePath('/dashboard/users')
 }

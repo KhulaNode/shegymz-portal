@@ -21,8 +21,6 @@ export default async function TrainersPage() {
             className="input-field" />
           <input name="email" type="email" placeholder="Email"
             className="input-field" />
-          <input name="budibaseUserId" placeholder="Budibase user ID *" required
-            className="input-field" />
           <input name="bio" placeholder="Bio"
             className="input-field" />
         </div>
@@ -37,7 +35,7 @@ export default async function TrainersPage() {
         <table className="w-full text-sm">
           <thead className="bg-zinc-800 text-zinc-400">
             <tr>
-              {['Name', 'Email', 'Budibase ID', 'Blocks', 'Sessions', 'Status', ''].map(h => (
+              {['Name', 'Email', 'Blocks', 'Sessions', 'Status', ''].map(h => (
                 <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
               ))}
             </tr>
@@ -47,7 +45,6 @@ export default async function TrainersPage() {
               <tr key={t.id} className="hover:bg-zinc-800/50">
                 <td className="px-4 py-3 text-white font-medium">{t.displayName}</td>
                 <td className="px-4 py-3 text-zinc-400">{t.email ?? '—'}</td>
-                <td className="px-4 py-3 text-zinc-500 font-mono text-xs">{t.budibaseUserId}</td>
                 <td className="px-4 py-3 text-zinc-400">{t._count.scheduleBlocks}</td>
                 <td className="px-4 py-3 text-zinc-400">{t._count.trainingSessions}</td>
                 <td className="px-4 py-3">

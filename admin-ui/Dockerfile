@@ -15,6 +15,7 @@ COPY prisma ./prisma
 COPY admin-ui ./
 
 RUN ./node_modules/.bin/prisma generate --schema=./prisma/schema.prisma
+ENV NODE_OPTIONS="--max-old-space-size=512"
 RUN npm run build
 
 # ── runner ────────────────────────────────────────────────
